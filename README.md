@@ -8,6 +8,8 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
 
 - `/` — statically generated Sushin OS desktop;
 - `/cv` — standalone semantic Russian HTML CV with stable section anchors;
+- `/box-news/[id]` — 130 build-time Russian Box News articles with stable URLs;
+- `/rss.xml`, `/sitemap.xml`, `/robots.txt` — static discovery surfaces;
 - framework-native 404 — includes the removed `/icon-studies` route.
 
 ## Current slice
@@ -27,6 +29,11 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
   surfaces, and Project Manager CV in HTML, PDF, and DOCX formats;
 - five confirmed project cases, seven capability directions, and a bilingual
   20-fact roulette with persisted sound preference and supported CV deep links;
+- deterministic Box News import for retained Telegram IDs 575–716 plus approved
+  WEBCOPY IDs 717–719, 74 site-owned cover copies, desktop pagination, article
+  metadata/JSON-LD and manual unpublish support;
+- a tested, inert-by-default Netcup webhook bundle for new posts, edits, albums,
+  durable retry handling and optional Git publishing;
 - shared loading, unavailable, malformed-content, empty and not-found states.
 
 The Music Utility is intentionally non-interactive in this checkpoint. A user-initiated capsule with visible Spotify Embed is scheduled for Phase 5.
@@ -48,10 +55,18 @@ npm test
 npm run dev
 npm run lint
 npm run build
+npm run box-news:import -- --source /absolute/private/result.json \
+  --legacy /absolute/legacy/posts.json \
+  --output content/box-news/posts.json \
+  --covers public/media/box-news \
+  --report tmp/box-news-import-report.json
+npm run box-news:unpublish -- --id 000
 npm start # preview the generated out/ directory
 ```
 
 No deployment or production publishing is configured or approved.
+Box News operations and the deferred server handoff are documented in
+`docs/BOX_NEWS_OPERATIONS.md`.
 
 ## Local browser note
 

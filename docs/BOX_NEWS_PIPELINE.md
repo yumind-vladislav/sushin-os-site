@@ -1,6 +1,7 @@
 # Box News — Telegram sync and publishing contract
 
-Status: approved architecture, implementation and deployment pending.
+Status: local implementation complete; Netcup, Telegram webhook, and Layero
+deployment remain separately gated.
 
 ## Confirmed inputs
 

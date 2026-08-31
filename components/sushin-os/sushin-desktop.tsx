@@ -8,11 +8,13 @@ import {
   resolveLocale,
   type Locale,
 } from '@/content/i18n';
+import type { BoxNewsSummary } from '@/lib/box-news';
 import {
   DesktopWindow,
   type WindowPosition,
   type WindowTransitionPhase,
 } from './desktop-window';
+import { BoxNewsPanel } from './box-news-panel';
 import { CapabilitiesPanel } from './capabilities-panel';
 import { ContactPanel } from './contact-panel';
 import { CvPanel } from './cv-panel';
@@ -29,7 +31,8 @@ type WindowId =
   | 'projects'
   | 'social'
   | 'contact'
-  | 'skills';
+  | 'skills'
+  | 'news';
 type Theme = 'aqua' | 'dark-aqua';
 type Wallpaper = 'day' | 'night';
 type MenuId = 'system' | 'file' | 'view' | 'window';
@@ -45,8 +48,12 @@ type ManagedWindow = {
 type WindowMap = Record<WindowId, ManagedWindow>;
 type WindowPhaseMap = Record<WindowId, WindowTransitionPhase>;
 
-const STORAGE_KEY = 'sushin-os.desktop.v3';
-const LEGACY_STORAGE_KEYS = ['sushin-os.desktop.v2', 'sushin-os.desktop.v1'];
+const STORAGE_KEY = 'sushin-os.desktop.v4';
+const LEGACY_STORAGE_KEYS = [
+  'sushin-os.desktop.v3',
+  'sushin-os.desktop.v2',
+  'sushin-os.desktop.v1',
+];
 const WINDOW_MOTION_MS = 420;
 const WINDOW_CLOSE_MS = 240;
 
@@ -100,6 +107,13 @@ const initialWindows: WindowMap = {
     zIndex: 3,
     position: { x: 240, y: 92 },
   },
+  news: {
+    open: false,
+    minimized: false,
+    maximized: false,
+    zIndex: 3,
+    position: { x: 194, y: 72 },
+  },
 };
 
 const initialWindowPhases: WindowPhaseMap = {
@@ -110,6 +124,7 @@ const initialWindowPhases: WindowPhaseMap = {
   social: 'idle',
   contact: 'idle',
   skills: 'idle',
+  news: 'idle',
 };
 
 const desktopIcons: Array<{
@@ -141,7 +156,13 @@ const desktopIcons: Array<{
     window: 'vladislav',
     align: 'right',
   },
-  { id: 'news', label: 'Box News', kind: 'news', align: 'right' },
+  {
+    id: 'news',
+    label: 'Box News',
+    kind: 'news',
+    window: 'news',
+    align: 'right',
+  },
 ];
 
 function readStoredDesktop(): {
@@ -186,7 +207,11 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-export function SushinDesktop() {
+export function SushinDesktop({
+  boxNewsPosts,
+}: {
+  boxNewsPosts: readonly BoxNewsSummary[];
+}) {
   const desktopRef = useRef<HTMLDivElement | null>(null);
   const menuBarRef = useRef<HTMLElement | null>(null);
   const zCounter = useRef(5);
@@ -475,6 +500,7 @@ export function SushinDesktop() {
     { id: 'skills', label: dictionary.desktop.skills },
     { id: 'social', label: dictionary.desktop.social },
     { id: 'contact', label: dictionary.desktop.write },
+    { id: 'news', label: dictionary.desktop.news },
   ];
 
   const dockMotionStyle = (index: number) => {
@@ -952,6 +978,32 @@ export function SushinDesktop() {
           </DesktopWindow>
         )}
 
+        {windows.news.open && (
+          <DesktopWindow
+            active={frontWindowId === 'news'}
+            className="news-window"
+            desktopRef={desktopRef}
+            id="news"
+            locale={locale}
+            maximized={windows.news.maximized}
+            minimized={windows.news.minimized}
+            mobile={isMobile}
+            onClose={() => closeWindow('news')}
+            onFocus={() => focusWindow('news')}
+            onMinimize={() => minimizeWindow('news')}
+            onMove={(position) => updateWindow('news', { position })}
+            onToggleMaximize={() =>
+              updateWindow('news', { maximized: !windows.news.maximized })
+            }
+            phase={windowPhases.news}
+            position={windows.news.position}
+            title={dictionary.desktop.news}
+            zIndex={windows.news.zIndex}
+          >
+            <BoxNewsPanel locale={locale} posts={boxNewsPosts} />
+          </DesktopWindow>
+        )}
+
         <nav aria-label="Sushin OS Dock" className="os-dock">
           <button
             aria-label={
@@ -1025,9 +1077,12 @@ export function SushinDesktop() {
             </button>
           )}
           <button
-            aria-label={`${dictionary.desktop.news} — ${dictionary.desktop.next}`}
+            aria-label={dictionary.desktop.news}
+            className={`${windows.news.open ? 'is-running' : ''} ${windows.news.minimized ? 'is-minimized-app' : ''}`}
             data-dock-index={newsDockIndex}
-            disabled
+            onBlur={() => setDockHoverIndex(null)}
+            onClick={() => openWindow('news')}
+            onFocus={() => setDockHoverIndex(newsDockIndex)}
             onPointerEnter={() => setDockHoverIndex(newsDockIndex)}
             onPointerLeave={() => setDockHoverIndex(null)}
             style={dockMotionStyle(newsDockIndex)}

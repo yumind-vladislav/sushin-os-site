@@ -9,9 +9,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "npx --yes serve@14.2.5 out",
-    "test": "node --test --import tsx \"tests/**/*.test.ts\"",
+    "test": "node --test --import tsx \"tests/**/*.test.ts\" && node --test \"services/box-news-webhook/test/**/*.test.mjs\"",
     "lint": "oxlint",
-    "format": "oxfmt"
+    "format": "oxfmt",
+    "box-news:import": "tsx scripts/import-box-news.ts",
+    "box-news:unpublish": "tsx scripts/unpublish-box-news.ts"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

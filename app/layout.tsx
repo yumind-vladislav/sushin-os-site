@@ -24,6 +24,7 @@ const localhostExtensionErrorGuard = `
 const localeBootstrap = `
 (() => {
   const storageKeys = [
+    'sushin-os.desktop.v4',
     'sushin-os.desktop.v3',
     'sushin-os.desktop.v2',
     'sushin-os.desktop.v1',

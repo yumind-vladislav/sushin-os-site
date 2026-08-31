@@ -25,6 +25,9 @@
 - Seven grouped capability directions and the approved bilingual 20-fact pool
   with non-repeat selection, persisted sound, reduced-motion behavior, and CV
   deep links.
+- Deterministic Box News history import, 130 static article routes, 74 owned
+  covers, desktop pagination, self-canonical metadata, Article JSON-LD, RSS,
+  sitemap, robots, manual unpublish, and a tested Netcup webhook bundle.
 
 ### Changed
 

@@ -21,3 +21,18 @@ remain outside the repository and are never modified.
 ## Wallpapers
 
 The owned day/night pair and its generation record will be added during Phase 5.
+
+## Box News covers
+
+- Public directory: `public/media/box-news/`
+- Source: owner-controlled photos embedded in the approved private Telegram
+  Desktop export
+- Derivation: deterministic copy by stable Telegram message ID; the raw export,
+  Telegram HTML, temporary CDN URLs, absent large files, and videos are not
+  included
+- Output: 74 site-owned cover files, 7.7 MB total
+- Aggregate SHA-256 of the sorted per-file checksum manifest:
+  `cb8bc8b4bd9de31d290fe22677b11bf53f3b23465819d77d4d2fefd80f51473f`
+- Rights: supplied through and approved for the site owner's own Box News
+  channel
+- Recorded: 2026-08-31

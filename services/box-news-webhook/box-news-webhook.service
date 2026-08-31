@@ -1,0 +1,22 @@
+[Unit]
+Description=Sushin OS Box News Telegram webhook
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=sushin-box-news
+Group=sushin-box-news
+WorkingDirectory=/opt/sushin-os-site/services/box-news-webhook
+EnvironmentFile=/etc/sushin-box-news-webhook.conf
+ExecStart=/usr/bin/node src/server.mjs
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/sushin-os-site/content/box-news /opt/sushin-os-site/public/media/box-news /var/lib/sushin-box-news
+
+[Install]
+WantedBy=multi-user.target
