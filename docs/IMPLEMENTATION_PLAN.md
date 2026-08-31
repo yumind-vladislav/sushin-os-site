@@ -177,11 +177,14 @@ Acceptance:
 
 Verification record (2026-08-31):
 
-- `npm test` — 36 tests passed, including concurrent webhook writes, album
-  cleanup during a flush, failed-push retry, and final UI acceptance checks;
+- `npm test` — 37 tests passed, including concurrent webhook writes, album
+  cleanup during a flush, failed-push retry, image-signature validation, and
+  final UI acceptance checks;
 - `npm run lint` — passed;
 - `npm run build` — passed; 139 static pages generated, including 130 Box News
   article routes;
+- `npm audit --omit=dev` — 0 vulnerabilities after deduplicating `undici` on
+  the patched 7.29.0 release in the lockfile;
 - desktop, mobile, keyboard-only, reduced-motion, RU/EN, project, Box News,
   Spotify-blocked, Privacy, and localized 404 flows passed in a real browser;
 - application console remained clear on normal routes; the intentional unknown

@@ -12,6 +12,7 @@ import {
   secureEqual,
 } from '../src/core.mjs';
 import { EventStore } from '../src/storage.mjs';
+import { imageExtensionFor } from '../src/telegram.mjs';
 import {
   commitAndPush,
   createPublishQueue,
@@ -99,6 +100,22 @@ test('normalizer publishes a poll question as marked plaintext', () => {
   assert.equal(event.post.content, 'ОПРОС TELEGRAM\nКакой вариант выбрать?');
 });
 
+test('photo validation trusts supported image signatures, not file names', () => {
+  assert.equal(imageExtensionFor(Buffer.from('ffd8ff00', 'hex')), '.jpg');
+  assert.equal(
+    imageExtensionFor(Buffer.from('89504e470d0a1a0a00', 'hex')),
+    '.png',
+  );
+  assert.equal(
+    imageExtensionFor(Buffer.from('524946460000000057454250', 'hex')),
+    '.webp',
+  );
+  assert.equal(
+    imageExtensionFor(Buffer.from('<html>not an image</html>')),
+    null,
+  );
+});
+
 test('edited channel posts replace the same stable ID when newer', () => {
   const incoming = update({ text: 'Edited' });
   incoming.edited_channel_post = {
@@ -173,7 +190,9 @@ test('event acceptance and pending albums survive a fresh store instance', async
 });
 
 test('album cleanup preserves events accepted during a flush', async () => {
-  const directory = await mkdtemp(path.join(os.tmpdir(), 'box-news-album-race-'));
+  const directory = await mkdtemp(
+    path.join(os.tmpdir(), 'box-news-album-race-'),
+  );
   try {
     const store = new EventStore(directory);
     await store.initialize();
@@ -193,7 +212,10 @@ test('album cleanup preserves events accepted during a flush', async () => {
       flushing.map(({ key }) => key),
     );
     const pending = await store.readAlbum('album-race');
-    assert.deepEqual(pending.map(({ key }) => key), [second.key]);
+    assert.deepEqual(
+      pending.map(({ key }) => key),
+      [second.key],
+    );
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

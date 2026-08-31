@@ -43,8 +43,9 @@
   localhost-only development origin and a required Layero production origin.
 - Serialized webhook publishing across normal updates and album flushes, made
   failed-push retries push existing commits, tightened unsupported-update
-  handling, preserved album events accepted during a concurrent flush, and
-  allowed the exact Git metadata path under systemd hardening.
+  handling, validated downloaded image signatures and size, preserved album
+  events accepted during a concurrent flush, and allowed the exact Git metadata
+  path under systemd hardening.
 - Disabled App Router prefetch for static RSS and CV PDF targets so the exported
   preview does not issue invalid RSC requests for those files.
 - Expanded Privacy disclosures and official Yandex/Spotify links while keeping

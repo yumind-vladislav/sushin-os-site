@@ -13,6 +13,8 @@ install the webhook or alter Netcup, Telegram, GitHub, or Layero.
 - stores an event receipt before returning success;
 - coalesces photo albums and resumes pending albums after a restart;
 - downloads the selected Telegram photo immediately into site-owned storage;
+- caps each downloaded photo at 20 MiB and accepts only JPEG, PNG, or WebP
+  signatures instead of trusting the remote file name;
 - serializes normal updates and album flushes across the JSON write, commit, and
   push boundary;
 - replaces edits by stable message ID and prevents duplicate commits;
