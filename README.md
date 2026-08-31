@@ -35,6 +35,7 @@ The approved local implementation may proceed. Public code-repository setup is a
 ## Local commands
 
 ```bash
+npm test
 npm run dev
 npm run lint
 npm run build

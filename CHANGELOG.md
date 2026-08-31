@@ -4,6 +4,8 @@
 
 ### Added
 
+- A Node test runner for typed content invariants; the pre-migration baseline
+  now passes `npm test`, `npm run lint`, and `npm run build`.
 - Public standalone repository `yumind-vladislav/sushin-os-site` with the
   approved local checkpoint as baseline commit `095b768`.
 - Canonical product brief with approved profile, CV, projects, social links,
