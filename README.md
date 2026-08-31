@@ -7,6 +7,7 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
 ## Routes
 
 - `/` — statically generated Sushin OS desktop;
+- `/cv` — standalone semantic Russian HTML CV with stable section anchors;
 - framework-native 404 — includes the removed `/icon-studies` route.
 
 ## Current slice
@@ -22,6 +23,8 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
 - typed RU/EN UI foundation with browser-language default and persisted manual
   override;
 - confirmed bilingual profile content and dynamic age calculation;
+- approved portrait derivative, full About timeline, direct contact/social
+  surfaces, and Project Manager CV in HTML, PDF, and DOCX formats;
 - shared loading, unavailable, malformed-content, empty and not-found states.
 
 The Music Utility is intentionally non-interactive in this checkpoint. A user-initiated capsule with visible Spotify Embed is scheduled for Phase 5.
@@ -56,5 +59,6 @@ Phantom can conflict with another wallet extension while both inject `window.eth
 
 - Editable icon source: `public/icons/source/icon-studies.svg`;
 - licensing notes: `ICON_LICENSES.md`;
+- source and transformation records: `docs/ASSET_PROVENANCE.md`;
 - the temporary Catalina day/night references are replaced by an owned pair in
   Phase 5 and must not be published before then.

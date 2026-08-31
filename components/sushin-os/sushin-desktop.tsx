@@ -13,11 +13,21 @@ import {
   type WindowPosition,
   type WindowTransitionPhase,
 } from './desktop-window';
+import { ContactPanel } from './contact-panel';
+import { CvPanel } from './cv-panel';
+import { ProjectsPreviewPanel } from './projects-preview-panel';
 import { RandomFactPanel } from './random-fact-panel';
+import { SocialPanel } from './social-panel';
 import { SystemIcon } from './system-icon';
 import { VladislavPanel } from './vladislav-panel';
 
-type WindowId = 'fact' | 'vladislav';
+type WindowId =
+  | 'fact'
+  | 'vladislav'
+  | 'cv'
+  | 'projects'
+  | 'social'
+  | 'contact';
 type Theme = 'aqua' | 'dark-aqua';
 type Wallpaper = 'day' | 'night';
 type MenuId = 'system' | 'file' | 'view' | 'window';
@@ -33,7 +43,8 @@ type ManagedWindow = {
 type WindowMap = Record<WindowId, ManagedWindow>;
 type WindowPhaseMap = Record<WindowId, WindowTransitionPhase>;
 
-const STORAGE_KEY = 'sushin-os.desktop.v1';
+const STORAGE_KEY = 'sushin-os.desktop.v2';
+const LEGACY_STORAGE_KEY = 'sushin-os.desktop.v1';
 const WINDOW_MOTION_MS = 420;
 const WINDOW_CLOSE_MS = 240;
 
@@ -52,11 +63,43 @@ const initialWindows: WindowMap = {
     zIndex: 3,
     position: { x: 126, y: 138 },
   },
+  cv: {
+    open: false,
+    minimized: false,
+    maximized: false,
+    zIndex: 3,
+    position: { x: 178, y: 70 },
+  },
+  projects: {
+    open: false,
+    minimized: false,
+    maximized: false,
+    zIndex: 3,
+    position: { x: 220, y: 110 },
+  },
+  social: {
+    open: false,
+    minimized: false,
+    maximized: false,
+    zIndex: 3,
+    position: { x: 270, y: 84 },
+  },
+  contact: {
+    open: false,
+    minimized: false,
+    maximized: false,
+    zIndex: 3,
+    position: { x: 318, y: 150 },
+  },
 };
 
 const initialWindowPhases: WindowPhaseMap = {
   fact: 'idle',
   vladislav: 'idle',
+  cv: 'idle',
+  projects: 'idle',
+  social: 'idle',
+  contact: 'idle',
 };
 
 const desktopIcons: Array<{
@@ -66,9 +109,21 @@ const desktopIcons: Array<{
   window?: WindowId;
   align: 'left' | 'right';
 }> = [
-  { id: 'cv', label: 'CV', kind: 'cv', align: 'left' },
-  { id: 'projects', label: 'Projects', kind: 'projects', align: 'left' },
-  { id: 'social', label: 'Social Media', kind: 'social', align: 'left' },
+  { id: 'cv', label: 'CV', kind: 'cv', window: 'cv', align: 'left' },
+  {
+    id: 'projects',
+    label: 'Projects',
+    kind: 'projects',
+    window: 'projects',
+    align: 'left',
+  },
+  {
+    id: 'social',
+    label: 'Social Media',
+    kind: 'social',
+    window: 'social',
+    align: 'left',
+  },
   {
     id: 'profile',
     label: 'Vladislav',
@@ -87,14 +142,27 @@ function readStoredDesktop(): {
 } | null {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored
-      ? (JSON.parse(stored) as {
-          windows?: WindowMap;
-          theme?: Theme;
-          wallpaper?: Wallpaper;
-          locale?: Locale;
-        })
-      : null;
+    if (stored) {
+      return JSON.parse(stored) as {
+        windows?: WindowMap;
+        theme?: Theme;
+        wallpaper?: Wallpaper;
+        locale?: Locale;
+      };
+    }
+
+    const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!legacy) return null;
+    const parsed = JSON.parse(legacy) as {
+      theme?: Theme;
+      wallpaper?: Wallpaper;
+      locale?: Locale;
+    };
+    return {
+      theme: parsed.theme,
+      wallpaper: parsed.wallpaper,
+      locale: parsed.locale,
+    };
   } catch {
     return null;
   }
@@ -719,7 +787,117 @@ export function SushinDesktop() {
             title={dictionary.desktop.profile}
             zIndex={windows.vladislav.zIndex}
           >
-            <VladislavPanel locale={locale} onOpenFact={() => openWindow('fact')} />
+            <VladislavPanel
+              locale={locale}
+              onOpenCv={() => openWindow('cv')}
+              onOpenProjects={() => openWindow('projects')}
+            />
+          </DesktopWindow>
+        )}
+
+        {windows.cv.open && (
+          <DesktopWindow
+            active={frontWindowId === 'cv'}
+            className="cv-window"
+            desktopRef={desktopRef}
+            id="cv"
+            locale={locale}
+            maximized={windows.cv.maximized}
+            minimized={windows.cv.minimized}
+            mobile={isMobile}
+            onClose={() => closeWindow('cv')}
+            onFocus={() => focusWindow('cv')}
+            onMinimize={() => minimizeWindow('cv')}
+            onMove={(position) => updateWindow('cv', { position })}
+            onToggleMaximize={() =>
+              updateWindow('cv', { maximized: !windows.cv.maximized })
+            }
+            phase={windowPhases.cv}
+            position={windows.cv.position}
+            title={dictionary.career.cvTitle}
+            zIndex={windows.cv.zIndex}
+          >
+            <CvPanel locale={locale} />
+          </DesktopWindow>
+        )}
+
+        {windows.projects.open && (
+          <DesktopWindow
+            active={frontWindowId === 'projects'}
+            className="projects-window"
+            desktopRef={desktopRef}
+            id="projects"
+            locale={locale}
+            maximized={windows.projects.maximized}
+            minimized={windows.projects.minimized}
+            mobile={isMobile}
+            onClose={() => closeWindow('projects')}
+            onFocus={() => focusWindow('projects')}
+            onMinimize={() => minimizeWindow('projects')}
+            onMove={(position) => updateWindow('projects', { position })}
+            onToggleMaximize={() =>
+              updateWindow('projects', {
+                maximized: !windows.projects.maximized,
+              })
+            }
+            phase={windowPhases.projects}
+            position={windows.projects.position}
+            title={dictionary.career.projectsTitle}
+            zIndex={windows.projects.zIndex}
+          >
+            <ProjectsPreviewPanel locale={locale} />
+          </DesktopWindow>
+        )}
+
+        {windows.social.open && (
+          <DesktopWindow
+            active={frontWindowId === 'social'}
+            className="social-window"
+            desktopRef={desktopRef}
+            id="social"
+            locale={locale}
+            maximized={windows.social.maximized}
+            minimized={windows.social.minimized}
+            mobile={isMobile}
+            onClose={() => closeWindow('social')}
+            onFocus={() => focusWindow('social')}
+            onMinimize={() => minimizeWindow('social')}
+            onMove={(position) => updateWindow('social', { position })}
+            onToggleMaximize={() =>
+              updateWindow('social', { maximized: !windows.social.maximized })
+            }
+            phase={windowPhases.social}
+            position={windows.social.position}
+            title={dictionary.career.socialTitle}
+            zIndex={windows.social.zIndex}
+          >
+            <SocialPanel locale={locale} />
+          </DesktopWindow>
+        )}
+
+        {windows.contact.open && (
+          <DesktopWindow
+            active={frontWindowId === 'contact'}
+            className="contact-window"
+            desktopRef={desktopRef}
+            id="contact"
+            locale={locale}
+            maximized={windows.contact.maximized}
+            minimized={windows.contact.minimized}
+            mobile={isMobile}
+            onClose={() => closeWindow('contact')}
+            onFocus={() => focusWindow('contact')}
+            onMinimize={() => minimizeWindow('contact')}
+            onMove={(position) => updateWindow('contact', { position })}
+            onToggleMaximize={() =>
+              updateWindow('contact', { maximized: !windows.contact.maximized })
+            }
+            phase={windowPhases.contact}
+            position={windows.contact.position}
+            title={dictionary.career.contactTitle}
+            zIndex={windows.contact.zIndex}
+          >
+            <ContactPanel locale={locale} />
           </DesktopWindow>
         )}
 
@@ -748,9 +926,12 @@ export function SushinDesktop() {
             <SystemIcon kind="about" size={58} />
           </button>
           <button
-            aria-label={`${dictionary.desktop.write} — ${dictionary.desktop.next}`}
+            aria-label={dictionary.desktop.write}
+            className={`${windows.contact.open ? 'is-running' : ''} ${windows.contact.minimized ? 'is-minimized-app' : ''}`}
             data-dock-index="1"
-            disabled
+            onBlur={() => setDockHoverIndex(null)}
+            onClick={() => openWindow('contact')}
+            onFocus={() => setDockHoverIndex(1)}
             onPointerEnter={() => setDockHoverIndex(1)}
             onPointerLeave={() => setDockHoverIndex(null)}
             style={dockMotionStyle(1)}

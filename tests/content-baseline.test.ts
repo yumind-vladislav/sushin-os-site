@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { careerContent, socialChannels } from '../content/career-content';
 import { resolveLocale } from '../content/i18n';
 import { calculateAge, siteContent } from '../content/site-content';
 import { sushinFacts } from '../content/sushin-os-content';
@@ -34,5 +35,31 @@ void describe('Sushin OS content baseline', () => {
       calculateAge(siteContent.profile.dateOfBirth, new Date('2026-05-31T12:00:00Z')),
       26,
     );
+  });
+
+  void it('keeps the approved career conversion exact', () => {
+    assert.equal(careerContent.actuality, 'август 2026');
+    assert.equal(
+      careerContent.education.status,
+      'неоконченное высшее, 2017–2021',
+    );
+    assert.equal(careerContent.contacts[0]?.label, 'vladislav.sushin@gmail.com');
+    assert.equal(careerContent.experience[0]?.title, '@yumind_bot / Mini App');
+  });
+
+  void it('keeps the approved social order and direct-contact surface', () => {
+    assert.deepEqual(
+      socialChannels.map(({ id }) => id),
+      [
+        'telegram-personal',
+        'telegram-blog',
+        'email',
+        'instagram',
+        'x',
+        'linkedin',
+        'github',
+      ],
+    );
+    assert.ok(socialChannels.every(({ href }) => !href.startsWith('/')));
   });
 });

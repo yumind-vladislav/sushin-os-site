@@ -23,11 +23,12 @@ const localhostExtensionErrorGuard = `
 
 const localeBootstrap = `
 (() => {
-  const storageKey = 'sushin-os.desktop.v1';
+  const storageKeys = ['sushin-os.desktop.v2', 'sushin-os.desktop.v1'];
   let savedLocale = null;
 
   try {
-    const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+    const stored = storageKeys.map((key) => localStorage.getItem(key)).find(Boolean);
+    const saved = JSON.parse(stored || 'null');
     savedLocale = saved?.locale;
   } catch {}
 

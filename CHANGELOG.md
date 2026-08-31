@@ -16,6 +16,10 @@
 - Phased implementation and review plan for a dedicated Berd executor session.
 - Box News import/webhook contract for `@trigger4site_bot` and the existing
   Telegram Desktop export.
+- Approved Project Manager CV as a semantic `/cv` route plus downloadable DOCX
+  and PDF artifacts.
+- Optimized portrait derivative, full About timeline, seven direct social
+  channels, and contact window without a lead form.
 
 ### Changed
 
@@ -25,3 +29,5 @@
 - `/icon-studies` and its public route components are removed.
 - Target architecture is standard Next.js static generation for Layero, with a
   separate Netcup webhook ingestion service.
+- Replaced profile and desktop placeholders with confirmed career copy and
+  direct navigation to CV, Projects, Telegram, and contact surfaces.
