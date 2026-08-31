@@ -59,9 +59,11 @@ discovery surface and will no longer receive a generated article route.
 
 ## Canonical URL
 
-Static metadata uses `NEXT_PUBLIC_SITE_URL`, with `https://sushin.dev` as the
-approved fallback. Set the final canonical origin in the Layero build settings
-before an authorized deployment if the production origin differs.
+Static metadata uses `NEXT_PUBLIC_SITE_URL`. When it is absent, repository-local
+checks use the explicitly non-production origin `http://localhost:3000`. Layero
+must receive the real public HTTP(S) origin in `NEXT_PUBLIC_SITE_URL` before an
+authorized production build; a build containing localhost canonicals must never
+be published.
 
 ## Deferred webhook handoff
 

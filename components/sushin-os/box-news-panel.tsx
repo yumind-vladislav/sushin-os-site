@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { dictionaries, type Locale } from '@/content/i18n';
 import type { BoxNewsSummary } from '@/lib/box-news';
-import { trackAnalyticsEvent } from '@/lib/analytics';
 import { ServiceState } from './service-state';
 
 const pageSize = 12;
@@ -22,10 +21,13 @@ export function BoxNewsPanel({
   const labels = dictionaries[locale].boxNews;
   const pageCount = Math.max(1, Math.ceil(posts.length / pageSize));
   const visiblePosts = posts.slice((page - 1) * pageSize, page * pageSize);
-  const dateFormatter = new Intl.DateTimeFormat(locale === 'ru' ? 'ru-RU' : 'en-GB', {
-    dateStyle: 'medium',
-    timeZone: 'UTC',
-  });
+  const dateFormatter = new Intl.DateTimeFormat(
+    locale === 'ru' ? 'ru-RU' : 'en-GB',
+    {
+      dateStyle: 'medium',
+      timeZone: 'UTC',
+    },
+  );
 
   if (posts.length === 0) {
     return (
@@ -52,9 +54,6 @@ export function BoxNewsPanel({
             <Link
               aria-label={`${labels.openArticle}: ${post.title}`}
               href={`/box-news/${post.id}/`}
-              onClick={() =>
-                trackAnalyticsEvent('box_news_open', { article_id: post.id })
-              }
             >
               <div className="box-news-cover">
                 {post.cover ? (
@@ -65,7 +64,9 @@ export function BoxNewsPanel({
                     src={post.cover.src}
                   />
                 ) : (
-                  <span>{post.media.length ? labels.mediaOnly : 'BOX NEWS'}</span>
+                  <span>
+                    {post.media.length ? labels.mediaOnly : 'BOX NEWS'}
+                  </span>
                 )}
               </div>
               <div className="box-news-card-copy">

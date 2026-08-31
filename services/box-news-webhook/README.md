@@ -13,7 +13,11 @@ install the webhook or alter Netcup, Telegram, GitHub, or Layero.
 - stores an event receipt before returning success;
 - coalesces photo albums and resumes pending albums after a restart;
 - downloads the selected Telegram photo immediately into site-owned storage;
+- serializes normal updates and album flushes across the JSON write, commit, and
+  push boundary;
 - replaces edits by stable message ID and prevents duplicate commits;
+- rejects updates without text/caption or supported media, while representing a
+  valid Telegram poll question as marked plaintext;
 - never renders Telegram HTML and does not log request bodies, content, tokens,
   secret headers, Telegram file URLs, or user identifiers;
 - keeps Git commit/push disabled unless `BOX_NEWS_GIT_PUSH=1` is explicitly set.
@@ -58,7 +62,9 @@ No production credentials are needed for those checks.
    there must be exactly one canonical writer.
 5. With separate explicit production authorization, verify the bot identity,
    install the Telegram webhook with the secret header and permitted update
-   types, then enable `BOX_NEWS_GIT_PUSH=1` only after a dry run is accepted.
+   types, then provision any push credential through a protected server-side
+   credential mechanism and enable `BOX_NEWS_GIT_PUSH=1` only after a dry run is
+   accepted. Never place the credential in this repository or the unit file.
 6. Verify a new post, an edit, an album, a duplicate retry, the static site build,
    and the resulting Layero deployment without exposing response bodies.
 

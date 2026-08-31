@@ -71,7 +71,9 @@ export default async function BoxNewsArticlePage({
       />
       <nav className="box-news-route-nav">
         <Link href="/">← Sushin OS</Link>
-        <Link href="/rss.xml">RSS</Link>
+        <Link href="/rss.xml" prefetch={false}>
+          RSS
+        </Link>
       </nav>
 
       <article className="box-news-article">

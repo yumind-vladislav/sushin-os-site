@@ -35,6 +35,7 @@ export function CvRouteActions() {
       <Link
         href="/cv/vladislav-sushin-project-manager-2026.pdf"
         onClick={() => trackAnalyticsEvent('cv_view', { format: 'pdf' })}
+        prefetch={false}
       >
         Открыть PDF
       </Link>

@@ -1903,11 +1903,30 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
 
 .project-card > header {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr);
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 10px;
   align-items: center;
   padding: 18px 21px;
   background: color-mix(in srgb, var(--os-accent) 7%, var(--os-window));
   border-bottom: 1px solid var(--os-window-line);
+}
+
+.project-card > header > button {
+  min-height: 34px;
+  padding: 0 11px;
+  color: var(--os-accent);
+  background: color-mix(in srgb, var(--os-accent) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--os-accent) 35%, var(--os-window-line));
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 720;
+}
+
+.project-card > header > button:hover,
+.project-card > header > button:focus-visible {
+  background: color-mix(in srgb, var(--os-accent) 16%, transparent);
 }
 
 .project-card > header > span {
@@ -1931,12 +1950,12 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   letter-spacing: 0.04em;
 }
 
-.project-card dl {
+.project-card-details dl {
   margin: 0;
   padding: 5px 21px;
 }
 
-.project-card dl > div {
+.project-card-details dl > div {
   display: grid;
   grid-template-columns: 126px minmax(0, 1fr);
   gap: 18px;
@@ -1944,11 +1963,11 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   border-bottom: 1px solid var(--os-window-line);
 }
 
-.project-card dl > div:last-child {
+.project-card-details dl > div:last-child {
   border-bottom: 0;
 }
 
-.project-card dt {
+.project-card-details dt {
   color: var(--os-accent);
   font-size: 8px;
   font-weight: 760;
@@ -1956,18 +1975,18 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   text-transform: uppercase;
 }
 
-.project-card dd {
+.project-card-details dd {
   margin: 0;
   font-size: 11px;
   line-height: 1.55;
 }
 
-.project-card dd ul {
+.project-card-details dd ul {
   margin: 0;
   padding-left: 17px;
 }
 
-.project-card > footer {
+.project-card-details > footer {
   display: flex;
   min-height: 48px;
   align-items: center;
@@ -1978,19 +1997,19 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   border-top: 1px solid var(--os-window-line);
 }
 
-.project-card > footer > strong,
-.project-card > footer > span {
+.project-card-details > footer > strong,
+.project-card-details > footer > span {
   color: var(--os-window-muted);
   font-size: 9px;
 }
 
-.project-card > footer > div {
+.project-card-details > footer > div {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.project-card > footer a {
+.project-card-details > footer a {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -1999,7 +2018,7 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   font-weight: 700;
 }
 
-.project-card > footer svg {
+.project-card-details > footer svg {
   width: 12px;
   height: 12px;
 }
@@ -2388,17 +2407,22 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
     padding: 16px;
   }
 
-  .project-card dl {
+  .project-card > header > button {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .project-card-details dl {
     padding: 3px 16px;
   }
 
-  .project-card dl > div {
+  .project-card-details dl > div {
     grid-template-columns: 1fr;
     gap: 7px;
     padding: 13px 0;
   }
 
-  .project-card > footer {
+  .project-card-details > footer {
     align-items: flex-start;
     flex-direction: column;
     padding: 12px 16px;

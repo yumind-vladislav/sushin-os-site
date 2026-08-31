@@ -26,7 +26,9 @@ void describe('Box News normalization', () => {
   });
 
   void it('ignores service records and normalizes stable Telegram ids', async () => {
-    const coverDirectory = await mkdtemp(path.join(tmpdir(), 'sushin-box-news-'));
+    const coverDirectory = await mkdtemp(
+      path.join(tmpdir(), 'sushin-box-news-'),
+    );
     const source = {
       type: 'public_channel',
       messages: [
@@ -40,7 +42,11 @@ void describe('Box News normalization', () => {
         },
       ],
     };
-    const result = await normalizeDesktopExport(source, coverDirectory, coverDirectory);
+    const result = await normalizeDesktopExport(
+      source,
+      coverDirectory,
+      coverDirectory,
+    );
     assert.equal(result.posts.length, 1);
     assert.equal(result.posts[0]?.id, '575');
     assert.equal(result.posts[0]?.content, 'Test title\nBody');
@@ -99,7 +105,10 @@ void describe('Box News normalization', () => {
 
   void it('removes hidden posts from discovery data', () => {
     const hidden = selectPublicBoxNews(boxNewsPosts, ['719']);
-    assert.equal(hidden.some(({ id }) => id === '719'), false);
+    assert.equal(
+      hidden.some(({ id }) => id === '719'),
+      false,
+    );
     assert.equal(hidden.length, boxNewsPosts.length - 1);
   });
 
@@ -107,10 +116,16 @@ void describe('Box News normalization', () => {
     const post = getBoxNewsPost('719');
     assert.ok(post);
     const metadata = buildBoxNewsMetadata(post);
-    assert.equal(metadata.alternates?.canonical, 'https://sushin.dev/box-news/719/');
-    assert.equal((metadata.openGraph as { type?: string } | undefined)?.type, 'article');
+    assert.equal(
+      metadata.alternates?.canonical,
+      'http://localhost:3000/box-news/719/',
+    );
+    assert.equal(
+      (metadata.openGraph as { type?: string } | undefined)?.type,
+      'article',
+    );
     const rss = buildBoxNewsRss([post]);
-    assert.match(rss, /https:\/\/sushin\.dev\/box-news\/719\//);
+    assert.match(rss, /http:\/\/localhost:3000\/box-news\/719\//);
     assert.match(rss, /<rss version="2\.0">/);
   });
 });

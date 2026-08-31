@@ -1,4 +1,11 @@
-import { mkdir, readdir, readFile, rename, unlink, writeFile } from 'node:fs/promises';
+import {
+  mkdir,
+  readdir,
+  readFile,
+  rename,
+  unlink,
+  writeFile,
+} from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 
@@ -22,7 +29,8 @@ async function atomicJson(filePath, value) {
 }
 
 function safeGroupId(value) {
-  if (!/^[A-Za-z0-9_-]+$/.test(value)) throw new TypeError('invalid_media_group');
+  if (!/^[A-Za-z0-9_-]+$/.test(value))
+    throw new TypeError('invalid_media_group');
   return value;
 }
 
@@ -39,13 +47,19 @@ export class EventStore {
   }
 
   async eventStatus(key) {
-    const state = await readJson(this.eventsPath, { schemaVersion: 1, events: {} });
+    const state = await readJson(this.eventsPath, {
+      schemaVersion: 1,
+      events: {},
+    });
     return state.events[key]?.status ?? null;
   }
 
   async mark(event, status) {
     this.writeChain = this.writeChain.then(async () => {
-      const state = await readJson(this.eventsPath, { schemaVersion: 1, events: {} });
+      const state = await readJson(this.eventsPath, {
+        schemaVersion: 1,
+        events: {},
+      });
       state.events[event.key] = {
         status,
         updateId: event.updateId,
@@ -64,22 +78,40 @@ export class EventStore {
   }
 
   async appendAlbum(event) {
-    const filePath = this.albumPath(event.mediaGroupId);
-    const events = await readJson(filePath, []);
-    if (!events.some(({ key }) => key === event.key)) events.push(event);
-    await atomicJson(filePath, events);
+    this.writeChain = this.writeChain.then(async () => {
+      const filePath = this.albumPath(event.mediaGroupId);
+      const events = await readJson(filePath, []);
+      if (!events.some(({ key }) => key === event.key)) events.push(event);
+      await atomicJson(filePath, events);
+    });
+    return this.writeChain;
   }
 
   async readAlbum(groupId) {
+    await this.writeChain;
     return readJson(this.albumPath(groupId), []);
   }
 
-  async removeAlbum(groupId) {
-    try {
-      await unlink(this.albumPath(groupId));
-    } catch (error) {
-      if (error?.code !== 'ENOENT') throw error;
-    }
+  async removeAlbum(groupId, processedKeys = null) {
+    this.writeChain = this.writeChain.then(async () => {
+      const filePath = this.albumPath(groupId);
+      const processed = processedKeys ? new Set(processedKeys) : null;
+      const remaining = processed
+        ? (await readJson(filePath, [])).filter(
+            ({ key }) => !processed.has(key),
+          )
+        : [];
+      if (remaining.length > 0) {
+        await atomicJson(filePath, remaining);
+        return;
+      }
+      try {
+        await unlink(filePath);
+      } catch (error) {
+        if (error?.code !== 'ENOENT') throw error;
+      }
+    });
+    return this.writeChain;
   }
 
   async listAlbumIds() {

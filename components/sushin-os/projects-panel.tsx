@@ -1,10 +1,26 @@
+'use client';
+
 import { ExternalLink } from 'lucide-react';
+import { useState } from 'react';
 import { dictionaries, type Locale } from '@/content/i18n';
-import { projectCards } from '@/content/work-content';
+import { projectCards, type ProjectId } from '@/content/work-content';
 import { trackAnalyticsEvent } from '@/lib/analytics';
 
 export function ProjectsPanel({ locale }: { locale: Locale }) {
   const labels = dictionaries[locale].work;
+  const [openProjects, setOpenProjects] = useState<readonly ProjectId[]>([]);
+
+  function toggleProject(projectId: ProjectId) {
+    const isOpen = openProjects.includes(projectId);
+    if (!isOpen) {
+      trackAnalyticsEvent('project_open', { project_id: projectId });
+    }
+    setOpenProjects(
+      isOpen
+        ? openProjects.filter((id) => id !== projectId)
+        : [...openProjects, projectId],
+    );
+  }
 
   return (
     <div className="projects-panel">
@@ -15,72 +31,89 @@ export function ProjectsPanel({ locale }: { locale: Locale }) {
       </header>
 
       <div className="project-card-list">
-        {projectCards.map((project, index) => (
-          <article className="project-card" id={`project-${project.id}`} key={project.id}>
-            <header>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <div>
-                <h3>{project.title}</h3>
-                <time>{project.period[locale]}</time>
-              </div>
-            </header>
-
-            <dl>
-              <div>
-                <dt>{labels.role}</dt>
-                <dd>{project.role[locale]}</dd>
-              </div>
-              <div>
-                <dt>{labels.challenge}</dt>
-                <dd>{project.challenge[locale]}</dd>
-              </div>
-              <div>
-                <dt>{labels.contribution}</dt>
-                <dd>
-                  <ul>
-                    {project.contribution.map((item) => (
-                      <li key={item.en}>{item[locale]}</li>
-                    ))}
-                  </ul>
-                </dd>
-              </div>
-              <div>
-                <dt>{labels.proof}</dt>
-                <dd>{project.proof[locale]}</dd>
-              </div>
-              <div>
-                <dt>{labels.status}</dt>
-                <dd>{project.status[locale]}</dd>
-              </div>
-            </dl>
-
-            <footer>
-              <strong>{labels.links}</strong>
-              {project.links.length ? (
+        {projectCards.map((project, index) => {
+          const isOpen = openProjects.includes(project.id);
+          const detailsId = `project-details-${project.id}`;
+          return (
+            <article
+              className={isOpen ? 'project-card is-open' : 'project-card'}
+              id={`project-${project.id}`}
+              key={project.id}
+            >
+              <header>
+                <span>{String(index + 1).padStart(2, '0')}</span>
                 <div>
-                  {project.links.map((link) => (
-                    <a
-                      href={link.href}
-                      key={link.href}
-                      onClick={() =>
-                        trackAnalyticsEvent('project_open', {
-                          project_id: project.id,
-                        })
-                      }
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      {link.label}
-                      <ExternalLink aria-hidden="true" />
-                    </a>
-                  ))}
+                  <h3>{project.title}</h3>
+                  <time>{project.period[locale]}</time>
                 </div>
-              ) : (
-                <span>{labels.noLinks}</span>
-              )}
-            </footer>
-          </article>
-        ))}
+                <button
+                  aria-controls={detailsId}
+                  aria-expanded={isOpen}
+                  onClick={() => toggleProject(project.id)}
+                  type="button"
+                >
+                  {isOpen ? labels.closeProject : labels.openProject}
+                </button>
+              </header>
+
+              <div
+                className="project-card-details"
+                hidden={!isOpen}
+                id={detailsId}
+              >
+                <dl>
+                  <div>
+                    <dt>{labels.role}</dt>
+                    <dd>{project.role[locale]}</dd>
+                  </div>
+                  <div>
+                    <dt>{labels.challenge}</dt>
+                    <dd>{project.challenge[locale]}</dd>
+                  </div>
+                  <div>
+                    <dt>{labels.contribution}</dt>
+                    <dd>
+                      <ul>
+                        {project.contribution.map((item) => (
+                          <li key={item.en}>{item[locale]}</li>
+                        ))}
+                      </ul>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{labels.proof}</dt>
+                    <dd>{project.proof[locale]}</dd>
+                  </div>
+                  <div>
+                    <dt>{labels.status}</dt>
+                    <dd>{project.status[locale]}</dd>
+                  </div>
+                </dl>
+
+                <footer>
+                  <strong>{labels.links}</strong>
+                  {project.links.length ? (
+                    <div>
+                      {project.links.map((link) => (
+                        <a
+                          href={link.href}
+                          key={link.href}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          {link.label}
+                          <ExternalLink aria-hidden="true" />
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <span>{labels.noLinks}</span>
+                  )}
+                </footer>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </div>
   );

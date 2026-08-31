@@ -36,7 +36,8 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
   local 04:00/17:00 switching and persisted manual override;
 - a typed Yandex Metrica adapter that is a complete no-op without its public
   counter ID, honors Do Not Track, disables Webvisor, and sends allowlisted IDs
-  rather than content or user input;
+  rather than content or user input; the counter remains off pending separate
+  consent-mechanism approval and Russian Federation legal review;
 - an accessible keyboard-operable Legal Fold plus direct Privacy/Terms routes,
   owner identity, third-party disclosures, and the dedicated legal email;
 - deterministic Box News import for retained Telegram IDs 575–716 plus approved
@@ -52,7 +53,8 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
 - `docs/INTERFACE_CONTRACT.md` — required behavior for each window, route and service state;
 - `docs/BOX_NEWS_PIPELINE.md` — Telegram import and `@trigger4site_bot` webhook contract;
 - `docs/IMPLEMENTATION_PLAN.md` — plan-mode phases, acceptance criteria and review protocol;
-- `docs/EXECUTOR_HANDOFF.md` — bounded instructions for the dedicated Berd implementation session.
+- `docs/EXECUTOR_HANDOFF.md` — bounded instructions for the dedicated Berd implementation session;
+- `docs/DEPLOYMENT_HANDOFF.md` — production-only Layero, Netcup, canonical-origin, and analytics gates.
 
 The approved local implementation may proceed. Public code-repository setup is approved. Layero deployment, Netcup mutation, Telegram webhook installation and production publishing remain separately gated.
 
@@ -73,9 +75,15 @@ npm start # preview the generated out/ directory
 ```
 
 No deployment or production publishing is configured or approved.
+Layero must receive the real production origin through
+`NEXT_PUBLIC_SITE_URL`; the built-in `http://localhost:3000` origin is only for
+local checks and must never be published. `NEXT_PUBLIC_YANDEX_METRICA_ID` must
+remain unset until the separately approved consent and legal gates are complete.
 Box News operations and the deferred server handoff are documented in
 `docs/BOX_NEWS_OPERATIONS.md`.
 Analytics and legal behavior are documented in `docs/ANALYTICS_AND_LEGAL.md`.
+The exact Layero/Netcup credential and deployment gates are documented in
+`docs/DEPLOYMENT_HANDOFF.md`.
 
 ## Local browser note
 

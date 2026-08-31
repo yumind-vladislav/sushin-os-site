@@ -16,7 +16,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/opt/sushin-os-site/content/box-news /opt/sushin-os-site/public/media/box-news /var/lib/sushin-box-news
+ReadWritePaths=/opt/sushin-os-site/content/box-news /opt/sushin-os-site/public/media/box-news /opt/sushin-os-site/.git /var/lib/sushin-box-news
 
 [Install]
 WantedBy=multi-user.target

@@ -8,6 +8,17 @@ import { downloadPhoto } from './telegram.mjs';
 
 const execFileAsync = promisify(execFile);
 
+export function createPublishQueue() {
+  let chain = Promise.resolve();
+  return {
+    run(task) {
+      const result = chain.then(task);
+      chain = result.catch(() => undefined);
+      return result;
+    },
+  };
+}
+
 async function readPosts(postsPath) {
   const value = JSON.parse(await readFile(postsPath, 'utf8'));
   if (!Array.isArray(value)) throw new TypeError('box_news_collection_invalid');
@@ -15,8 +26,14 @@ async function readPosts(postsPath) {
 }
 
 export async function writeEvent({ event, token, repositoryDirectory }) {
-  const postsPath = path.join(repositoryDirectory, 'content/box-news/posts.json');
-  const mediaDirectory = path.join(repositoryDirectory, 'public/media/box-news');
+  const postsPath = path.join(
+    repositoryDirectory,
+    'content/box-news/posts.json',
+  );
+  const mediaDirectory = path.join(
+    repositoryDirectory,
+    'public/media/box-news',
+  );
   const posts = await readPosts(postsPath);
   const cover = await downloadPhoto({
     token,
@@ -49,19 +66,26 @@ export async function commitAndPush({
   await execFileAsync('git', ['add', '--', ...trackedPaths], {
     cwd: repositoryDirectory,
   });
+  let hasStagedChanges = false;
   try {
     await execFileAsync('git', ['diff', '--cached', '--quiet'], {
       cwd: repositoryDirectory,
     });
-    return false;
   } catch (error) {
     if (error?.code !== 1) throw new Error('git_diff_failed');
+    hasStagedChanges = true;
   }
-  await execFileAsync('git', ['commit', '-m', `content(box-news): sync ${postId}`], {
-    cwd: repositoryDirectory,
-  });
+  if (hasStagedChanges) {
+    await execFileAsync(
+      'git',
+      ['commit', '-m', `content(box-news): sync ${postId}`],
+      {
+        cwd: repositoryDirectory,
+      },
+    );
+  }
   await execFileAsync('git', ['push', 'origin', branch], {
     cwd: repositoryDirectory,
   });
-  return true;
+  return hasStagedChanges;
 }

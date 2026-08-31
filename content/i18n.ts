@@ -66,7 +66,8 @@ const ru = {
     ready: 'Spotify готов',
     blocked: 'Spotify не открылся',
     blockedTitle: 'Spotify не открылся',
-    blockedCopy: 'Можно повторить, открыть плейлист отдельно или сообщить о блокировке вручную.',
+    blockedCopy:
+      'Можно повторить, открыть плейлист отдельно или сообщить о блокировке вручную.',
     blockedHelp: 'Плейлист не открылся?',
     retry: 'Повторить',
     openPlaylist: 'Открыть Spotify',
@@ -100,7 +101,8 @@ const ru = {
     html: 'HTML',
     pdf: 'PDF',
     pdfLoading: 'Подготавливаем локальную PDF-версию.',
-    pdfUnavailable: 'PDF не открылся. HTML-версия и скачивание остаются доступны.',
+    pdfUnavailable:
+      'PDF не открылся. HTML-версия и скачивание остаются доступны.',
     openFull: 'Открыть отдельную HTML-версию',
     downloadPdf: 'Скачать PDF',
     downloadDocx: 'Скачать DOCX',
@@ -110,12 +112,14 @@ const ru = {
     timeline: 'Короткая хронология',
     socialTitle: 'Социальные сети',
     contactTitle: 'Написать мне',
-    contactCopy: 'Для работы и сотрудничества быстрее всего написать в личный Telegram. Email подойдет для формальной переписки и документов.',
+    contactCopy:
+      'Для работы и сотрудничества быстрее всего написать в личный Telegram. Email подойдет для формальной переписки и документов.',
     personalTelegram: 'Открыть личный Telegram',
     email: 'Написать на Gmail',
     blog: 'Читать Telegram-блог',
     projectsTitle: 'Проекты',
-    projectsCopy: 'Пять подтвержденных направлений: детали, вклад и доказательства открываются в отдельном окне.',
+    projectsCopy:
+      'Пять подтвержденных направлений: детали, вклад и доказательства открываются в отдельном окне.',
   },
   work: {
     role: 'Роль',
@@ -125,10 +129,14 @@ const ru = {
     status: 'Статус',
     links: 'Публичные ссылки',
     noLinks: 'Публичная ссылка не заявлена.',
+    openProject: 'Открыть детали',
+    closeProject: 'Скрыть детали',
     directionsEyebrow: 'НАПРАВЛЕНИЯ, С КОТОРЫМИ Я РАБОТАЮ',
     directionsTitle: 'Что я могу делать',
-    directionsCopy: 'Семь рабочих направлений — это области практики, а не заявление об одинаковом уровне мастерства во всём.',
-    directionsNote: 'Названия инструментов показывают рабочий стек; они не заменяют описание компетенций.',
+    directionsCopy:
+      'Семь рабочих направлений — это области практики, а не заявление об одинаковом уровне мастерства во всём.',
+    directionsNote:
+      'Названия инструментов показывают рабочий стек; они не заменяют описание компетенций.',
   },
   boxNews: {
     eyebrow: 'СТАТИЧЕСКИЙ АРХИВ · TELEGRAM',
@@ -153,11 +161,13 @@ const ru = {
     loadingTitle: 'Sushin OS запускается',
     loadingCopy: 'Подготавливаем рабочий стол и локальные данные.',
     errorTitle: 'Окно не открылось',
-    errorCopy: 'Можно безопасно повторить попытку — ваши настройки останутся на устройстве.',
+    errorCopy:
+      'Можно безопасно повторить попытку — ваши настройки останутся на устройстве.',
     retry: 'Повторить',
     notFoundCode: 'ОШИБКА 404',
     notFoundTitle: 'Такого объекта нет на рабочем столе',
-    notFoundCopy: 'Ссылка могла устареть. Вернитесь в Sushin OS и откройте нужное окно оттуда.',
+    notFoundCopy:
+      'Ссылка могла устареть. Вернитесь в Sushin OS и откройте нужное окно оттуда.',
     home: 'Вернуться в Sushin OS',
     empty: 'Здесь пока нет опубликованных материалов.',
     unavailable: 'Сервис сейчас недоступен.',
@@ -221,7 +231,8 @@ const en: UiDictionary = {
     ready: 'Spotify is ready',
     blocked: 'Spotify did not open',
     blockedTitle: 'Spotify did not open',
-    blockedCopy: 'Retry, open the playlist separately, or report the block manually.',
+    blockedCopy:
+      'Retry, open the playlist separately, or report the block manually.',
     blockedHelp: 'Playlist did not open?',
     retry: 'Retry',
     openPlaylist: 'Open Spotify',
@@ -265,12 +276,14 @@ const en: UiDictionary = {
     timeline: 'Short timeline',
     socialTitle: 'Social Media',
     contactTitle: 'Write to Me',
-    contactCopy: 'For work and collaboration, personal Telegram is the fastest route. Use email for formal communication and documents.',
+    contactCopy:
+      'For work and collaboration, personal Telegram is the fastest route. Use email for formal communication and documents.',
     personalTelegram: 'Open personal Telegram',
     email: 'Send an email',
     blog: 'Read the Telegram blog',
     projectsTitle: 'Projects',
-    projectsCopy: 'Five confirmed directions. Each case separates role, contribution, proof, and status.',
+    projectsCopy:
+      'Five confirmed directions. Each case separates role, contribution, proof, and status.',
   },
   work: {
     role: 'Role',
@@ -280,10 +293,14 @@ const en: UiDictionary = {
     status: 'Status',
     links: 'Public links',
     noLinks: 'No public link is claimed.',
+    openProject: 'Open details',
+    closeProject: 'Hide details',
     directionsEyebrow: 'DIRECTIONS I WORK WITH',
     directionsTitle: 'What I Can Do',
-    directionsCopy: 'Seven working directions describe areas of practice, not identical mastery across every field.',
-    directionsNote: 'Tool names show the working stack; they do not replace capability descriptions.',
+    directionsCopy:
+      'Seven working directions describe areas of practice, not identical mastery across every field.',
+    directionsNote:
+      'Tool names show the working stack; they do not replace capability descriptions.',
   },
   boxNews: {
     eyebrow: 'STATIC ARCHIVE · TELEGRAM',
@@ -308,11 +325,13 @@ const en: UiDictionary = {
     loadingTitle: 'Sushin OS is starting',
     loadingCopy: 'Preparing the desktop and local data.',
     errorTitle: 'The window did not open',
-    errorCopy: 'It is safe to try again — your preferences remain on this device.',
+    errorCopy:
+      'It is safe to try again — your preferences remain on this device.',
     retry: 'Try again',
     notFoundCode: 'ERROR 404',
     notFoundTitle: 'That object is not on the desktop',
-    notFoundCopy: 'The link may be stale. Return to Sushin OS and open the window from there.',
+    notFoundCopy:
+      'The link may be stale. Return to Sushin OS and open the window from there.',
     home: 'Return to Sushin OS',
     empty: 'There are no published materials here yet.',
     unavailable: 'The service is currently unavailable.',

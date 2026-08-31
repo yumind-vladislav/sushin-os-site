@@ -175,6 +175,21 @@ Acceptance:
 - remaining actions are only credential installation, Layero connection,
   Yandex counter ID, and explicit deployment approval.
 
+Verification record (2026-08-31):
+
+- `npm test` — 36 tests passed, including concurrent webhook writes, album
+  cleanup during a flush, failed-push retry, and final UI acceptance checks;
+- `npm run lint` — passed;
+- `npm run build` — passed; 139 static pages generated, including 130 Box News
+  article routes;
+- desktop, mobile, keyboard-only, reduced-motion, RU/EN, project, Box News,
+  Spotify-blocked, Privacy, and localized 404 flows passed in a real browser;
+- application console remained clear on normal routes; the intentional unknown
+  URL produced only its expected HTTP 404 resource entry;
+- production remained untouched. See `docs/DEPLOYMENT_HANDOFF.md` for the
+  separately gated Layero, Netcup, canonical-origin, analytics, and credential
+  steps.
+
 ## Review workflow
 
 1. One Berd implementation session owns all source edits.

@@ -1,12 +1,30 @@
 import type { ReactNode } from 'react';
 
 type ServiceStateProps = {
-  eyebrow?: string;
-  title: string;
-  message: string;
+  eyebrow?: ReactNode;
+  title: ReactNode;
+  message: ReactNode;
   action?: ReactNode;
   compact?: boolean;
 };
+
+type LocalizedCopyProps = {
+  ru: string;
+  en: string;
+};
+
+export function LocalizedCopy({ ru, en }: LocalizedCopyProps) {
+  return (
+    <>
+      <span className="service-copy" data-service-locale="ru">
+        {ru}
+      </span>
+      <span className="service-copy" data-service-locale="en" lang="en">
+        {en}
+      </span>
+    </>
+  );
+}
 
 export function ServiceState({
   eyebrow,

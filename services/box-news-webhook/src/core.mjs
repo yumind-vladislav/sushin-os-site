@@ -1,7 +1,11 @@
 import { timingSafeEqual } from 'node:crypto';
 
 export function secureEqual(provided, expected) {
-  if (typeof provided !== 'string' || typeof expected !== 'string' || !expected) {
+  if (
+    typeof provided !== 'string' ||
+    typeof expected !== 'string' ||
+    !expected
+  ) {
     return false;
   }
   const left = Buffer.from(provided);
@@ -11,15 +15,20 @@ export function secureEqual(provided, expected) {
   const paddedRight = Buffer.alloc(size);
   left.copy(paddedLeft);
   right.copy(paddedRight);
-  return left.length === right.length && timingSafeEqual(paddedLeft, paddedRight);
+  return (
+    left.length === right.length && timingSafeEqual(paddedLeft, paddedRight)
+  );
 }
 
 function asRecord(value) {
-  return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value
+    : {};
 }
 
 function isoFromSeconds(value) {
-  if (!Number.isInteger(value) || value <= 0) throw new TypeError('invalid_timestamp');
+  if (!Number.isInteger(value) || value <= 0)
+    throw new TypeError('invalid_timestamp');
   return new Date(value * 1000).toISOString();
 }
 
@@ -42,7 +51,10 @@ function normalizeText(value) {
 }
 
 function titleFor(id, content, hasMedia) {
-  const firstLine = content.split('\n').find((line) => line.trim())?.trim();
+  const firstLine = content
+    .split('\n')
+    .find((line) => line.trim())
+    ?.trim();
   if (firstLine) return truncateAtWord(firstLine, 120);
   return hasMedia ? `Медиа-публикация ${id}` : `Публикация ${id}`;
 }
@@ -62,7 +74,8 @@ function extractReferences(text, entities) {
     const entity = asRecord(rawEntity);
     const offset = Number(entity.offset);
     const length = Number(entity.length);
-    if (!Number.isInteger(offset) || !Number.isInteger(length) || length <= 0) continue;
+    if (!Number.isInteger(offset) || !Number.isInteger(length) || length <= 0)
+      continue;
     const label = text.slice(offset, offset + length).trim();
     const url = typeof entity.url === 'string' ? entity.url : label;
     let parsed;
@@ -88,26 +101,37 @@ function selectedPhoto(message) {
   return valid.at(-1) ?? null;
 }
 
+function pollContent(value) {
+  const question = normalizeText(asRecord(value).question);
+  return question ? `ОПРОС TELEGRAM\n${question}` : '';
+}
+
 export function normalizeTelegramUpdate(updateValue, expectedChatId) {
   const update = asRecord(updateValue);
-  if (!Number.isInteger(update.update_id)) throw new TypeError('invalid_update_id');
+  if (!Number.isInteger(update.update_id))
+    throw new TypeError('invalid_update_id');
   const edited = Boolean(update.edited_channel_post);
   const message = asRecord(update.edited_channel_post ?? update.channel_post);
   if (!message.message_id) throw new TypeError('unsupported_update');
   const chat = asRecord(message.chat);
-  if (String(chat.id ?? '') !== String(expectedChatId)) throw new TypeError('wrong_chat');
-  if (!Number.isInteger(message.message_id)) throw new TypeError('invalid_message_id');
+  if (String(chat.id ?? '') !== String(expectedChatId))
+    throw new TypeError('wrong_chat');
+  if (!Number.isInteger(message.message_id))
+    throw new TypeError('invalid_message_id');
 
   const id = String(message.message_id);
   const telegramUrl = `https://t.me/yumind_reborn/${id}`;
-  const content = normalizeText(message.text ?? message.caption);
+  const content =
+    normalizeText(message.text ?? message.caption) || pollContent(message.poll);
   const entities = message.text ? message.entities : message.caption_entities;
   const photo = selectedPhoto(message);
   const media = [];
   if (photo) media.push({ type: 'photo', telegramUrl });
-  if (message.video || message.animation) media.push({ type: 'video', telegramUrl });
+  if (message.video || message.animation)
+    media.push({ type: 'video', telegramUrl });
   if (message.document) media.push({ type: 'file', telegramUrl });
   const hasMedia = media.length > 0;
+  if (!content && !hasMedia) throw new TypeError('unsupported_update');
 
   return {
     key: `${update.update_id}:${chat.id}:${message.message_id}`,
@@ -115,7 +139,9 @@ export function normalizeTelegramUpdate(updateValue, expectedChatId) {
     chatId: String(chat.id),
     messageId: message.message_id,
     mediaGroupId:
-      typeof message.media_group_id === 'string' ? message.media_group_id : null,
+      typeof message.media_group_id === 'string'
+        ? message.media_group_id
+        : null,
     photo: photo
       ? {
           fileId: photo.file_id,
@@ -156,7 +182,9 @@ export function coalesceAlbumEvents(events) {
     .toSorted((left, right) => left.localeCompare(right))
     .at(-1);
   const photoEvent = sorted.find(({ photo }) => photo);
-  const mediaTypes = new Set(sorted.flatMap(({ post }) => post.media.map(({ type }) => type)));
+  const mediaTypes = new Set(
+    sorted.flatMap(({ post }) => post.media.map(({ type }) => type)),
+  );
   const telegramUrl = `https://t.me/yumind_reborn/${primary.messageId}`;
   return {
     ...primary,

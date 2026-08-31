@@ -40,6 +40,18 @@ a:focus-visible {
   box-shadow: 0 0 0 5px var(--cat-accent);
 }
 
+.service-copy[data-service-locale='en'] {
+  display: none;
+}
+
+html[data-ui-locale='en'] .service-copy[data-service-locale='ru'] {
+  display: none;
+}
+
+html[data-ui-locale='en'] .service-copy[data-service-locale='en'] {
+  display: inline;
+}
+
 .route-state {
   display: grid;
   min-height: 100svh;

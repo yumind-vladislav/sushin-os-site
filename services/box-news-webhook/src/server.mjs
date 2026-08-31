@@ -1,8 +1,12 @@
 import http from 'node:http';
 import path from 'node:path';
-import { coalesceAlbumEvents, normalizeTelegramUpdate, secureEqual } from './core.mjs';
+import {
+  coalesceAlbumEvents,
+  normalizeTelegramUpdate,
+  secureEqual,
+} from './core.mjs';
 import { EventStore } from './storage.mjs';
-import { commitAndPush, writeEvent } from './writer.mjs';
+import { commitAndPush, createPublishQueue, writeEvent } from './writer.mjs';
 
 const BODY_LIMIT = 1024 * 1024;
 
@@ -48,7 +52,10 @@ const config = {
   repositoryDirectory: path.resolve(required('BOX_NEWS_REPOSITORY_DIRECTORY')),
   gitPush: process.env.BOX_NEWS_GIT_PUSH === '1',
   gitBranch: process.env.BOX_NEWS_GIT_BRANCH || 'main',
-  albumDelayMs: Math.max(500, Number(process.env.BOX_NEWS_ALBUM_DELAY_MS || 2500)),
+  albumDelayMs: Math.max(
+    500,
+    Number(process.env.BOX_NEWS_ALBUM_DELAY_MS || 2500),
+  ),
 };
 
 if (!Number.isInteger(config.port) || config.port < 1 || config.port > 65535) {
@@ -57,19 +64,22 @@ if (!Number.isInteger(config.port) || config.port < 1 || config.port > 65535) {
 
 const store = new EventStore(config.stateDirectory);
 const albumTimers = new Map();
+const publishQueue = createPublishQueue();
 
 async function publish(event) {
-  const result = await writeEvent({
-    event,
-    token: config.token,
-    repositoryDirectory: config.repositoryDirectory,
-  });
-  await commitAndPush({
-    repositoryDirectory: config.repositoryDirectory,
-    trackedPaths: result.trackedPaths,
-    postId: result.id,
-    branch: config.gitBranch,
-    enabled: config.gitPush,
+  return publishQueue.run(async () => {
+    const result = await writeEvent({
+      event,
+      token: config.token,
+      repositoryDirectory: config.repositoryDirectory,
+    });
+    await commitAndPush({
+      repositoryDirectory: config.repositoryDirectory,
+      trackedPaths: result.trackedPaths,
+      postId: result.id,
+      branch: config.gitBranch,
+      enabled: config.gitPush,
+    });
   });
 }
 
@@ -80,7 +90,10 @@ async function flushAlbum(groupId) {
   const event = coalesceAlbumEvents(events);
   await publish(event);
   for (const albumEvent of events) await store.mark(albumEvent, 'applied');
-  await store.removeAlbum(groupId);
+  await store.removeAlbum(
+    groupId,
+    events.map(({ key }) => key),
+  );
 }
 
 function scheduleAlbum(groupId) {

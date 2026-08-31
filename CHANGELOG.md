@@ -39,6 +39,20 @@
 
 ### Changed
 
+- Removed the unowned `sushin.dev` canonical fallback in favor of an explicit
+  localhost-only development origin and a required Layero production origin.
+- Serialized webhook publishing across normal updates and album flushes, made
+  failed-push retries push existing commits, tightened unsupported-update
+  handling, preserved album events accepted during a concurrent flush, and
+  allowed the exact Git metadata path under systemd hardening.
+- Disabled App Router prefetch for static RSS and CV PDF targets so the exported
+  preview does not issue invalid RSC requests for those files.
+- Expanded Privacy disclosures and official Yandex/Spotify links while keeping
+  Metrica disabled pending separate consent and Russian legal review.
+- Localized framework/service states, made every project card analytics event
+  user-initiated through an accessible details control, and reduced Box News to
+  one open event emitted by the article route.
+
 - Migrated the build from Vinext/Vite/Cloudflare to standard Next.js App Router
   static export for the Layero handoff.
 - Alternative Reality is removed from the first public release.
