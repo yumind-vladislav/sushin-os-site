@@ -67,6 +67,10 @@ export default function PrivacyPage() {
           <a href="https://yandex.com/support/metrica/en/general/cookie-usage">
             cookie и localStorage Metrica
           </a>
+          , а также{' '}
+          <a href="https://yandex.com/legal/metrica_termsofuse/en/">
+            Metrica Terms of Use
+          </a>
           .
         </p>
       </section>

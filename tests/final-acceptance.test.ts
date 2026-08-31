@@ -9,6 +9,11 @@ import {
   ServiceState,
 } from '../components/sushin-os/service-state';
 import { localDevelopmentSiteUrl, resolveSiteUrl } from '../lib/site';
+import {
+  createVisitorClockFormatter,
+  fallbackTimeZone,
+  resolveVisitorTimeZone,
+} from '../lib/time-zone';
 
 async function source(relativePath: string): Promise<string> {
   return readFile(new URL(`../${relativePath}`, import.meta.url), 'utf8');
@@ -42,6 +47,21 @@ void describe('final acceptance blockers', () => {
     assert.match(html, /Try again/);
   });
 
+  void it('uses Europe/Moscow in both clock formatters when browser time zone is unavailable', () => {
+    assert.equal(resolveVisitorTimeZone(), fallbackTimeZone);
+    const clock = createVisitorClockFormatter('en');
+    assert.equal(clock.timeZone, 'Europe/Moscow');
+    assert.equal(clock.zoneLabel, 'Moscow');
+    assert.equal(
+      clock.format(new Date('2026-01-01T00:00:00.000Z')).time,
+      '03:00',
+    );
+    assert.match(
+      clock.format(new Date('2026-01-01T22:00:00.000Z')).date,
+      /02 Jan/,
+    );
+  });
+
   void it('provides an accessible user interaction for every project card', () => {
     const html = renderToStaticMarkup(
       createElement(ProjectsPanel, { locale: 'en' }),
@@ -72,6 +92,27 @@ void describe('final acceptance blockers', () => {
     );
   });
 
+  void it('keeps Box News content Russian and article service chrome bilingual', async () => {
+    const [article, panel, i18n] = await Promise.all([
+      source('app/box-news/[id]/page.tsx'),
+      source('components/sushin-os/box-news-panel.tsx'),
+      source('content/i18n.ts'),
+    ]);
+    assert.match(panel, /labels\.languageNote/);
+    assert.match(i18n, /Box News article content is available in Russian/);
+    assert.match(
+      article,
+      /className="box-news-article-body" lang="ru"/,
+    );
+    assert.match(article, /CONTENT IN RUSSIAN/);
+    assert.match(article, /Links from the post/);
+    assert.match(article, /Open the original on Telegram/);
+    assert.match(article, /Adjacent posts/);
+    assert.match(article, /Newer:/);
+    assert.match(article, /Older:/);
+    assert.match(article, /moscowDateFormatters\.en/);
+  });
+
   void it('keeps framework states localized and privacy links official', async () => {
     const [error, loading, notFound, privacy, analyticsDocs, unit] =
       await Promise.all([
@@ -88,6 +129,10 @@ void describe('final acceptance blockers', () => {
     assert.match(
       privacy,
       /yandex\.com\/support\/metrica\/en\/code\/data-collected/,
+    );
+    assert.match(
+      privacy,
+      /https:\/\/yandex\.com\/legal\/metrica_termsofuse\/en\//,
     );
     assert.match(
       privacy,

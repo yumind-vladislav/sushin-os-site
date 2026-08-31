@@ -46,6 +46,7 @@ export function BoxNewsPanel({
         <small>{labels.eyebrow}</small>
         <h2>{labels.title}</h2>
         <p>{labels.copy}</p>
+        <p>{labels.languageNote}</p>
       </header>
 
       <div className="box-news-list">

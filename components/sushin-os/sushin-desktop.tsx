@@ -15,6 +15,11 @@ import {
 import { trackAnalyticsEvent } from '@/lib/analytics';
 import type { BoxNewsSummary } from '@/lib/box-news';
 import {
+  createVisitorClockFormatter,
+  detectVisitorTimeZone,
+  fallbackTimeZone,
+} from '@/lib/time-zone';
+import {
   DesktopWindow,
   type WindowPosition,
   type WindowTransitionPhase,
@@ -237,7 +242,8 @@ export function SushinDesktop({
   const [clock, setClock] = useState({
     time: '--:--',
     date: '—',
-    zone: 'LOCAL',
+    zone: fallbackTimeZone,
+    zoneLabel: 'Moscow',
   });
   const [activeMenu, setActiveMenu] = useState<MenuId | null>(null);
   const [dockHoverIndex, setDockHoverIndex] = useState<number | null>(null);
@@ -329,26 +335,12 @@ export function SushinDesktop({
   }, []);
 
   useEffect(() => {
-    const language = locale === 'ru' ? 'ru-RU' : 'en-GB';
-    const formatter = new Intl.DateTimeFormat(language, {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-    const dateFormatter = new Intl.DateTimeFormat(language, {
-      weekday: 'short',
-      day: '2-digit',
-      month: 'short',
-    });
-    const zone =
-      Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local time';
+    const formatter = createVisitorClockFormatter(
+      locale,
+      detectVisitorTimeZone(),
+    );
     const updateClock = () => {
-      const now = new Date();
-      setClock({
-        time: formatter.format(now),
-        date: dateFormatter.format(now),
-        zone,
-      });
+      setClock(formatter.format(new Date()));
     };
     updateClock();
     const timer = window.setInterval(updateClock, 30_000);
@@ -648,7 +640,7 @@ export function SushinDesktop({
             ◐
           </button>
           <span className="timezone-label" title={clock.zone}>
-            {clock.zone.split('/').at(-1)?.replaceAll('_', ' ')}
+            {clock.zoneLabel}
           </span>
           <span>{clock.date}</span>
           <strong>{clock.time}</strong>
