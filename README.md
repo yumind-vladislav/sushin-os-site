@@ -1,5 +1,7 @@
 # Sushin OS site
 
+Repository: [yumind-vladislav/sushin-os-site](https://github.com/yumind-vladislav/sushin-os-site).
+
 Standalone localhost-first implementation of the Sushin OS personal site. The editable 19-scene design presentation remains in the root project at `app/sushin-os/` and is not imported into this application.
 
 ## Routes

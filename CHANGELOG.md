@@ -4,6 +4,8 @@
 
 ### Added
 
+- Public standalone repository `yumind-vladislav/sushin-os-site` with the
+  approved local checkpoint as baseline commit `095b768`.
 - Canonical product brief with approved profile, CV, projects, social links,
   Random Facts, Box News, Spotify, appearance, SEO, analytics, and legal inputs.
 - Interface contract for every public Sushin OS function and route.

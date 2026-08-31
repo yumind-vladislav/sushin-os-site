@@ -3,6 +3,10 @@
 Status: GO approved for local implementation and repository setup on
 2026-08-31. Production deployment remains separately gated.
 
+Standalone repository initialized and published at
+`https://github.com/yumind-vladislav/sushin-os-site`. Baseline commit:
+`095b768`.
+
 ## Goal
 
 Deliver a complete, tested Sushin OS portfolio that prioritizes employment and
