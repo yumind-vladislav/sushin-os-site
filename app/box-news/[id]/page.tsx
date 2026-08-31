@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { BoxNewsAnalyticsSignal } from '@/components/analytics/route-signals';
 import { notFound } from 'next/navigation';
 import {
   boxNewsPosts,
@@ -61,6 +62,7 @@ export default async function BoxNewsArticlePage({
 
   return (
     <main className="box-news-route" lang="ru">
+      <BoxNewsAnalyticsSignal articleId={post.id} />
       <script
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(structuredData).replaceAll('<', '\\u003c'),

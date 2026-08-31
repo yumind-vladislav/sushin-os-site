@@ -9,6 +9,7 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
 - `/` — statically generated Sushin OS desktop;
 - `/cv` — standalone semantic Russian HTML CV with stable section anchors;
 - `/box-news/[id]` — 130 build-time Russian Box News articles with stable URLs;
+- `/privacy` and `/terms` — directly reachable legal/privacy documents;
 - `/rss.xml`, `/sitemap.xml`, `/robots.txt` — static discovery surfaces;
 - framework-native 404 — includes the removed `/icon-studies` route.
 
@@ -33,6 +34,11 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
   issue-report paths; no iframe or Spotify request exists before the first click;
 - an original generated northern-island day/night wallpaper pair with automatic
   local 04:00/17:00 switching and persisted manual override;
+- a typed Yandex Metrica adapter that is a complete no-op without its public
+  counter ID, honors Do Not Track, disables Webvisor, and sends allowlisted IDs
+  rather than content or user input;
+- an accessible keyboard-operable Legal Fold plus direct Privacy/Terms routes,
+  owner identity, third-party disclosures, and the dedicated legal email;
 - deterministic Box News import for retained Telegram IDs 575–716 plus approved
   WEBCOPY IDs 717–719, 74 site-owned cover copies, desktop pagination, article
   metadata/JSON-LD and manual unpublish support;
@@ -69,6 +75,7 @@ npm start # preview the generated out/ directory
 No deployment or production publishing is configured or approved.
 Box News operations and the deferred server handoff are documented in
 `docs/BOX_NEWS_OPERATIONS.md`.
+Analytics and legal behavior are documented in `docs/ANALYTICS_AND_LEGAL.md`.
 
 ## Local browser note
 

@@ -100,7 +100,14 @@ export const careerContent = {
 } as const;
 
 export type SocialChannel = {
-  id: string;
+  id:
+    | 'telegram-personal'
+    | 'telegram-blog'
+    | 'email'
+    | 'instagram'
+    | 'x'
+    | 'linkedin'
+    | 'github';
   name: string;
   href: string;
   purpose: LocalizedText;

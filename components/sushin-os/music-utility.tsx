@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { dictionaries, type Locale } from '@/content/i18n';
+import { trackAnalyticsEvent } from '@/lib/analytics';
 
 const playlistUrl =
   'https://open.spotify.com/playlist/37i9dQZF1EIURi4iOpY7wW?si=5b25bf57f4d840ae';
@@ -14,16 +15,29 @@ type MusicState = 'idle' | 'loading' | 'ready' | 'blocked';
 
 export function MusicUtility({ locale }: { locale: Locale }) {
   const [state, setState] = useState<MusicState>('idle');
+  const blockedTracked = useRef(false);
   const labels = dictionaries[locale].music;
+
+  const showBlockedState = useCallback(() => {
+    if (!blockedTracked.current) {
+      trackAnalyticsEvent('music_blocked', {});
+      blockedTracked.current = true;
+    }
+    setState('blocked');
+  }, []);
 
   useEffect(() => {
     if (state !== 'loading') return;
-    const timeout = window.setTimeout(() => setState('blocked'), 10_000);
+    const timeout = window.setTimeout(showBlockedState, 10_000);
     return () => window.clearTimeout(timeout);
-  }, [state]);
+  }, [showBlockedState, state]);
 
   const activate = () => {
-    if (state === 'idle' || state === 'blocked') setState('loading');
+    if (state === 'idle' || state === 'blocked') {
+      blockedTracked.current = false;
+      trackAnalyticsEvent('music_start', {});
+      setState('loading');
+    }
   };
 
   return (
@@ -84,7 +98,7 @@ export function MusicUtility({ locale }: { locale: Locale }) {
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 height="152"
                 loading="eager"
-                onError={() => setState('blocked')}
+                onError={showBlockedState}
                 onLoad={() => setState('ready')}
                 src={embedUrl}
                 title={labels.frameTitle}
@@ -93,7 +107,7 @@ export function MusicUtility({ locale }: { locale: Locale }) {
               {state === 'ready' && (
                 <button
                   className="music-help-trigger"
-                  onClick={() => setState('blocked')}
+                  onClick={showBlockedState}
                   type="button"
                 >
                   {labels.blockedHelp}

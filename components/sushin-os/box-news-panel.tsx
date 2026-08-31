@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { dictionaries, type Locale } from '@/content/i18n';
 import type { BoxNewsSummary } from '@/lib/box-news';
+import { trackAnalyticsEvent } from '@/lib/analytics';
+import { ServiceState } from './service-state';
 
 const pageSize = 12;
 
@@ -25,6 +27,17 @@ export function BoxNewsPanel({
     timeZone: 'UTC',
   });
 
+  if (posts.length === 0) {
+    return (
+      <ServiceState
+        compact
+        eyebrow="BOX NEWS"
+        message={dictionaries[locale].states.empty}
+        title={labels.title}
+      />
+    );
+  }
+
   return (
     <div className="box-news-panel">
       <header>
@@ -36,7 +49,13 @@ export function BoxNewsPanel({
       <div className="box-news-list">
         {visiblePosts.map((post) => (
           <article className="box-news-card" key={post.id}>
-            <Link aria-label={`${labels.openArticle}: ${post.title}`} href={`/box-news/${post.id}/`}>
+            <Link
+              aria-label={`${labels.openArticle}: ${post.title}`}
+              href={`/box-news/${post.id}/`}
+              onClick={() =>
+                trackAnalyticsEvent('box_news_open', { article_id: post.id })
+              }
+            >
               <div className="box-news-cover">
                 {post.cover ? (
                   <Image

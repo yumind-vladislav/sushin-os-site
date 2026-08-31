@@ -1,6 +1,7 @@
 import { ExternalLink } from 'lucide-react';
 import { dictionaries, type Locale } from '@/content/i18n';
 import { projectCards } from '@/content/work-content';
+import { trackAnalyticsEvent } from '@/lib/analytics';
 
 export function ProjectsPanel({ locale }: { locale: Locale }) {
   const labels = dictionaries[locale].work;
@@ -58,7 +59,17 @@ export function ProjectsPanel({ locale }: { locale: Locale }) {
               {project.links.length ? (
                 <div>
                   {project.links.map((link) => (
-                    <a href={link.href} key={link.href} rel="noreferrer" target="_blank">
+                    <a
+                      href={link.href}
+                      key={link.href}
+                      onClick={() =>
+                        trackAnalyticsEvent('project_open', {
+                          project_id: project.id,
+                        })
+                      }
+                      rel="noreferrer"
+                      target="_blank"
+                    >
                       {link.label}
                       <ExternalLink aria-hidden="true" />
                     </a>

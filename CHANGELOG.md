@@ -32,6 +32,10 @@
   manual GitHub issue path that includes no visitor data.
 - Original generated day/night northern-island wallpapers, automatic local
   04:00/17:00 schedule, and persisted day/night overrides.
+- Typed no-op-safe Yandex Metrica adapter with the approved goal names, Do Not
+  Track support, and Webvisor disabled.
+- Direct Privacy and Terms routes, owner/third-party disclosures, dedicated
+  legal email, accessible Legal Fold, and site-wide social metadata.
 
 ### Changed
 

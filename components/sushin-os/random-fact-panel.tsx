@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { dictionaries, type Locale } from '@/content/i18n';
 import { sushinFacts } from '@/content/sushin-os-content';
 import { nextFactIndex } from '@/lib/random-fact';
+import { trackAnalyticsEvent } from '@/lib/analytics';
 
 const rouletteDelays = [45, 95, 155, 225, 305, 395, 495, 610, 740];
 const soundStorageKey = 'sushin-os.random-fact.sound.v1';
@@ -70,6 +71,9 @@ export function RandomFactPanel({ locale }: { locale: Locale }) {
         Math.random(),
       );
       setFactIndex(finalIndex);
+      trackAnalyticsEvent('random_fact_spin', {
+        fact_id: sushinFacts[finalIndex].id,
+      });
       if (context) playFactSound(context);
     };
 

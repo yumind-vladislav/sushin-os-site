@@ -1,7 +1,14 @@
 import type { LocalizedText } from './site-content';
 
+export type ProjectId =
+  | 'yumind'
+  | 'yumind-bot'
+  | 'yumind-reborn'
+  | 'crypto'
+  | 'selected-client-work';
+
 export type ProjectCard = {
-  id: string;
+  id: ProjectId;
   title: string;
   period: LocalizedText;
   role: LocalizedText;

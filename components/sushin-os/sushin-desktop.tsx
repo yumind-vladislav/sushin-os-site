@@ -12,6 +12,7 @@ import {
   wallpaperForLocalHour,
   type Wallpaper,
 } from '@/lib/appearance';
+import { trackAnalyticsEvent } from '@/lib/analytics';
 import type { BoxNewsSummary } from '@/lib/box-news';
 import {
   DesktopWindow,
@@ -22,6 +23,7 @@ import { BoxNewsPanel } from './box-news-panel';
 import { CapabilitiesPanel } from './capabilities-panel';
 import { ContactPanel } from './contact-panel';
 import { CvPanel } from './cv-panel';
+import { LegalFold } from './legal-fold';
 import { MusicUtility } from './music-utility';
 import { ProjectsPanel } from './projects-panel';
 import { RandomFactPanel } from './random-fact-panel';
@@ -412,6 +414,8 @@ export function SushinDesktop({
   };
 
   const openWindow = (id: WindowId) => {
+    if (id === 'vladislav') trackAnalyticsEvent('profile_open', {});
+    if (id === 'cv') trackAnalyticsEvent('cv_view', { format: 'html' });
     const nextZ = ++zCounter.current;
     const phase: WindowTransitionPhase = !windows[id].open
       ? 'opening'
@@ -1113,6 +1117,7 @@ export function SushinDesktop({
           </button>
         </nav>
 
+        <LegalFold locale={locale} />
         <span className="wallpaper-credit">
           {dictionary.desktop.wallpaperCredit}
         </span>
