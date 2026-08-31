@@ -1798,6 +1798,14 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   font-size: 13px;
 }
 
+.social-panel li .social-display-label {
+  overflow-wrap: anywhere;
+  color: var(--os-accent);
+  font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  font-size: 10px;
+  line-height: 1.3;
+}
+
 .social-panel li small {
   color: var(--os-window-muted);
   font-size: 10px;

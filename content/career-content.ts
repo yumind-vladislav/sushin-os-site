@@ -109,6 +109,7 @@ export type SocialChannel = {
     | 'linkedin'
     | 'github';
   name: string;
+  displayLabel: string;
   href: string;
   purpose: LocalizedText;
 };
@@ -117,6 +118,7 @@ export const socialChannels: readonly SocialChannel[] = [
   {
     id: 'telegram-personal',
     name: 'Personal Telegram',
+    displayLabel: 't.me/takoikakvse1',
     href: 'https://t.me/takoikakvse1',
     purpose: {
       ru: 'Самый быстрый способ обсудить работу и сотрудничество.',
@@ -126,6 +128,7 @@ export const socialChannels: readonly SocialChannel[] = [
   {
     id: 'telegram-blog',
     name: 'Telegram blog',
+    displayLabel: 't.me/yumind_reborn',
     href: 'https://t.me/yumind_reborn',
     purpose: {
       ru: 'AI-эксперименты, production-заметки, проекты и оригиналы Box News.',
@@ -135,6 +138,7 @@ export const socialChannels: readonly SocialChannel[] = [
   {
     id: 'email',
     name: 'Email',
+    displayLabel: 'vladislav.sushin@gmail.com',
     href: 'mailto:vladislav.sushin@gmail.com',
     purpose: {
       ru: 'Формальная переписка и документы.',
@@ -144,6 +148,7 @@ export const socialChannels: readonly SocialChannel[] = [
   {
     id: 'instagram',
     name: 'Instagram',
+    displayLabel: '@takoikakvse',
     href: 'https://instagram.com/takoikakvse',
     purpose: {
       ru: 'Короткие форматы и личная сторона процесса.',
@@ -153,6 +158,7 @@ export const socialChannels: readonly SocialChannel[] = [
   {
     id: 'x',
     name: 'X',
+    displayLabel: '@takoikakvse1',
     href: 'https://x.com/takoikakvse1',
     purpose: {
       ru: 'Короткие наблюдения и обсуждение AI.',
@@ -162,6 +168,7 @@ export const socialChannels: readonly SocialChannel[] = [
   {
     id: 'linkedin',
     name: 'LinkedIn',
+    displayLabel: '/in/vladislav-sushyn',
     href: 'https://www.linkedin.com/in/vladislav-sushyn',
     purpose: {
       ru: 'Профессиональный опыт и нетворкинг.',
@@ -171,6 +178,7 @@ export const socialChannels: readonly SocialChannel[] = [
   {
     id: 'github',
     name: 'GitHub',
+    displayLabel: 'yumind-vladislav',
     href: 'https://github.com/yumind-vladislav',
     purpose: {
       ru: 'Публичный код и прототипы.',

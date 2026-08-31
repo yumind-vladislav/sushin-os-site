@@ -230,6 +230,16 @@ Order and purpose:
    experience and networking.
 7. GitHub — `https://github.com/yumind-vladislav` — public code and prototypes.
 
+Visible account labels use the same fixed order:
+
+1. Personal Telegram — `t.me/takoikakvse1`.
+2. Telegram blog — `t.me/yumind_reborn`.
+3. Email — `vladislav.sushin@gmail.com`.
+4. Instagram — `@takoikakvse`.
+5. X — `@takoikakvse1`.
+6. LinkedIn — `/in/vladislav-sushyn`.
+7. GitHub — `yumind-vladislav`.
+
 Use direct links only. There is no contact form and no message storage.
 
 ## 9. Box News

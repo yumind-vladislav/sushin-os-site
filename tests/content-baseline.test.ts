@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { SocialPanel } from '../components/sushin-os/social-panel';
 import { careerContent, socialChannels } from '../content/career-content';
 import { resolveLocale } from '../content/i18n';
 import { calculateAge, siteContent } from '../content/site-content';
@@ -7,6 +11,11 @@ import { sushinFacts } from '../content/sushin-os-content';
 import { capabilityGroups, projectCards } from '../content/work-content';
 import { wallpaperForLocalHour } from '../lib/appearance';
 import { nextFactIndex } from '../lib/random-fact';
+
+const productBrief = readFileSync(
+  new URL('../docs/PRODUCT_BRIEF.md', import.meta.url),
+  'utf8',
+);
 
 void describe('Sushin OS content baseline', () => {
   void it('keeps a complete, stable fact pool', () => {
@@ -74,6 +83,26 @@ void describe('Sushin OS content baseline', () => {
         'github',
       ],
     );
+    const displayLabels = [
+      't.me/takoikakvse1',
+      't.me/yumind_reborn',
+      'vladislav.sushin@gmail.com',
+      '@takoikakvse',
+      '@takoikakvse1',
+      '/in/vladislav-sushyn',
+      'yumind-vladislav',
+    ];
+    assert.deepEqual(
+      socialChannels.map(({ displayLabel }) => displayLabel),
+      displayLabels,
+    );
+    const socialHtml = renderToStaticMarkup(
+      createElement(SocialPanel, { locale: 'en' }),
+    );
+    for (const displayLabel of displayLabels) {
+      assert.ok(socialHtml.includes(displayLabel));
+      assert.ok(productBrief.includes(`\`${displayLabel}\``));
+    }
     assert.ok(socialChannels.every(({ href }) => !href.startsWith('/')));
   });
 

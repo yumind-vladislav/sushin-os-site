@@ -23,6 +23,9 @@ export function SocialPanel({ locale }: { locale: Locale }) {
               target="_blank"
             >
               <strong>{channel.name}</strong>
+              <span className="social-display-label">
+                {channel.displayLabel}
+              </span>
               <small>{channel.purpose[locale]}</small>
               <ExternalLink aria-hidden="true" />
             </a>
