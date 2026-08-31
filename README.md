@@ -29,14 +29,16 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
   surfaces, and Project Manager CV in HTML, PDF, and DOCX formats;
 - five confirmed project cases, seven capability directions, and a bilingual
   20-fact roulette with persisted sound preference and supported CV deep links;
+- a user-initiated Spotify capsule with loading, ready, blocked, retry and manual
+  issue-report paths; no iframe or Spotify request exists before the first click;
+- an original generated northern-island day/night wallpaper pair with automatic
+  local 04:00/17:00 switching and persisted manual override;
 - deterministic Box News import for retained Telegram IDs 575–716 plus approved
   WEBCOPY IDs 717–719, 74 site-owned cover copies, desktop pagination, article
   metadata/JSON-LD and manual unpublish support;
 - a tested, inert-by-default Netcup webhook bundle for new posts, edits, albums,
   durable retry handling and optional Git publishing;
 - shared loading, unavailable, malformed-content, empty and not-found states.
-
-The Music Utility is intentionally non-interactive in this checkpoint. A user-initiated capsule with visible Spotify Embed is scheduled for Phase 5.
 
 ## Canonical implementation brief
 
@@ -77,5 +79,4 @@ Phantom can conflict with another wallet extension while both inject `window.eth
 - Editable icon source: `public/icons/source/icon-studies.svg`;
 - licensing notes: `ICON_LICENSES.md`;
 - source and transformation records: `docs/ASSET_PROVENANCE.md`;
-- the temporary Catalina day/night references are replaced by an owned pair in
-  Phase 5 and must not be published before then.
+- full wallpaper prompts and visual QA: `docs/WALLPAPER_GENERATION.md`.

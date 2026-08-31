@@ -16,7 +16,7 @@
   overflow: hidden;
   color: #fff;
   background-color: #07111d;
-  background-image: url('https://media.512pixels.net/downloads/macos-wallpapers-6k/10-15-Night-6k.jpg');
+  background-image: url('/wallpapers/northern-island-night.webp');
   background-position: center;
   background-size: cover;
   font-family: var(--cat-font);
@@ -24,7 +24,7 @@
 }
 
 .sushin-desktop.wallpaper-day {
-  background-image: url('https://media.512pixels.net/downloads/macos-wallpapers-6k/10-15-Day-6k.jpg');
+  background-image: url('/wallpapers/northern-island-day.webp');
 }
 
 .sushin-desktop.theme-dark-aqua {
@@ -182,13 +182,20 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   visibility: hidden;
 }
 
-.music-capsule {
+.music-utility {
   position: absolute;
   top: 0;
   left: 50%;
+  z-index: 7;
+  width: 236px;
+  transform: translateX(-50%);
+}
+
+.music-capsule {
+  position: relative;
   align-self: start;
   display: grid;
-  width: 236px;
+  width: 100%;
   height: 42px;
   grid-template-columns: 23px 1fr 32px;
   gap: 8px;
@@ -201,7 +208,8 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   box-shadow:
     inset 0 -1px rgba(255, 255, 255, 0.08),
     0 7px 18px rgba(0, 0, 0, 0.28);
-  transform: translateX(-50%);
+  cursor: pointer;
+  text-align: left;
 }
 
 .music-capsule::after {
@@ -231,7 +239,7 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   font-size: 8px;
 }
 
-.music-capsule div {
+.capsule-copy {
   display: flex;
   min-width: 0;
   flex-direction: column;
@@ -279,6 +287,117 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
 }
 .capsule-eq i:nth-child(4) {
   height: 15px;
+}
+
+.music-utility.is-ready .capsule-eq i {
+  animation: music-meter 920ms ease-in-out infinite alternate;
+}
+
+.music-utility.is-ready .capsule-eq i:nth-child(2) {
+  animation-delay: -420ms;
+}
+
+.music-utility.is-ready .capsule-eq i:nth-child(3) {
+  animation-delay: -680ms;
+}
+
+.music-popover {
+  position: absolute;
+  top: 47px;
+  left: 50%;
+  width: 360px;
+  min-height: 152px;
+  padding: 4px;
+  color: #fff;
+  background: rgba(2, 4, 8, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 15px;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
+  transform: translateX(-50%);
+  animation: menu-open 160ms var(--ease-out) both;
+}
+
+.music-popover iframe {
+  display: block;
+  border: 0;
+  border-radius: 11px;
+}
+
+.music-help-trigger {
+  display: block;
+  margin: 3px 5px 2px auto;
+  padding: 3px 5px;
+  color: rgba(255, 255, 255, 0.58);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.music-help-trigger:hover {
+  color: #fff;
+}
+
+.music-loading-state {
+  position: absolute;
+  inset: 4px;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.74);
+  background: #11151d;
+  border-radius: 11px;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+.music-blocked-state {
+  display: grid;
+  min-height: 144px;
+  align-content: center;
+  gap: 8px;
+  padding: 18px;
+  background: linear-gradient(145deg, #171c25, #0d1016);
+  border-radius: 11px;
+}
+
+.music-blocked-state strong {
+  font-size: 15px;
+}
+
+.music-blocked-state p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.music-blocked-state div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.music-blocked-state button,
+.music-blocked-state a {
+  padding: 6px 9px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.music-blocked-state a:last-child {
+  color: #85c9ff;
+}
+
+@keyframes music-meter {
+  to {
+    transform: scaleY(0.45);
+    opacity: 0.9;
+  }
 }
 
 .os-menu {
@@ -374,7 +493,7 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   inset: 32px 0 0;
   overflow: hidden;
   background-color: #07111d;
-  background-image: url('https://media.512pixels.net/downloads/macos-wallpapers-6k/10-15-Night-6k.jpg');
+  background-image: url('/wallpapers/northern-island-night.webp');
   background-position: center;
   background-size: cover;
 }
@@ -385,7 +504,7 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   z-index: 0;
   background-image:
     linear-gradient(rgba(139, 193, 255, 0.09), rgba(5, 20, 37, 0.12)),
-    url('https://media.512pixels.net/downloads/macos-wallpapers-6k/10-15-Day-6k.jpg');
+    url('/wallpapers/northern-island-day.webp');
   background-position: center;
   background-size: cover;
   content: '';
@@ -2039,14 +2158,18 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
     left: 7px;
   }
 
-  .music-capsule {
-    position: absolute;
-    top: 0;
-    left: 50%;
+  .music-utility {
     width: 184px;
+  }
+
+  .music-capsule {
     height: 38px;
     grid-template-columns: 22px 1fr 27px;
-    transform: translateX(-50%);
+  }
+
+  .music-popover {
+    top: 43px;
+    width: calc(100vw - 16px);
   }
 
   .capsule-play {
@@ -2226,7 +2349,7 @@ html[data-ui-locale='en'] .sushin-desktop[data-locale='ru'] {
   .menu-app-trigger {
     display: none;
   }
-  .music-capsule {
+  .music-utility {
     width: 174px;
   }
   .os-dock button {

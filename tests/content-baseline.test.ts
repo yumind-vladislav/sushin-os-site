@@ -5,6 +5,7 @@ import { resolveLocale } from '../content/i18n';
 import { calculateAge, siteContent } from '../content/site-content';
 import { sushinFacts } from '../content/sushin-os-content';
 import { capabilityGroups, projectCards } from '../content/work-content';
+import { wallpaperForLocalHour } from '../lib/appearance';
 import { nextFactIndex } from '../lib/random-fact';
 
 void describe('Sushin OS content baseline', () => {
@@ -41,6 +42,13 @@ void describe('Sushin OS content baseline', () => {
       calculateAge(siteContent.profile.dateOfBirth, new Date('2026-05-31T12:00:00Z')),
       26,
     );
+  });
+
+  void it('switches the automatic wallpaper at 04:00 and 17:00 local time', () => {
+    assert.equal(wallpaperForLocalHour(3), 'night');
+    assert.equal(wallpaperForLocalHour(4), 'day');
+    assert.equal(wallpaperForLocalHour(16), 'day');
+    assert.equal(wallpaperForLocalHour(17), 'night');
   });
 
   void it('keeps the approved career conversion exact', () => {

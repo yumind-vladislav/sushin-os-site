@@ -20,7 +20,26 @@ remain outside the repository and are never modified.
 
 ## Wallpapers
 
-The owned day/night pair and its generation record will be added during Phase 5.
+- Public files:
+  - `public/wallpapers/northern-island-day.webp`
+  - `public/wallpapers/northern-island-night.webp`
+- Source: original AI-generated fictional northern-island scene; no source or
+  reference image was supplied
+- Tool mode: built-in `image_gen`; day generated as `photorealistic-natural`,
+  night created as a `lighting-weather` edit of the selected day so composition
+  and geography stay aligned
+- Output: both files are 1672 × 941 px WebP; converted from generated PNG with
+  `cwebp -q 94 -m 6 -sharp_yuv`, without resizing
+- SHA-256 day:
+  `2b2504d0c923a440eb3c97b7c4d3df7d20d801d3a989c8df4d58e191e2ded82c`
+- SHA-256 night:
+  `bf1ccd4f89d84e21c0ad502eb4ea1bf219b110e6b259c0194050f80d80741504`
+- Constraints: fictional geography; no direct Catalina/macOS wallpaper copy;
+  no text, marks, people, buildings, or third-party source assets
+- Full prompts and visual QA record: `docs/WALLPAPER_GENERATION.md`
+- Rights: original project-owned pair generated for and approved for use on the
+  site owner's portfolio
+- Recorded: 2026-08-31
 
 ## Box News covers
 

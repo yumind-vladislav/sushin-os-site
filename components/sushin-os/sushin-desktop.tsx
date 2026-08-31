@@ -8,6 +8,10 @@ import {
   resolveLocale,
   type Locale,
 } from '@/content/i18n';
+import {
+  wallpaperForLocalHour,
+  type Wallpaper,
+} from '@/lib/appearance';
 import type { BoxNewsSummary } from '@/lib/box-news';
 import {
   DesktopWindow,
@@ -18,6 +22,7 @@ import { BoxNewsPanel } from './box-news-panel';
 import { CapabilitiesPanel } from './capabilities-panel';
 import { ContactPanel } from './contact-panel';
 import { CvPanel } from './cv-panel';
+import { MusicUtility } from './music-utility';
 import { ProjectsPanel } from './projects-panel';
 import { RandomFactPanel } from './random-fact-panel';
 import { SocialPanel } from './social-panel';
@@ -34,7 +39,6 @@ type WindowId =
   | 'skills'
   | 'news';
 type Theme = 'aqua' | 'dark-aqua';
-type Wallpaper = 'day' | 'night';
 type MenuId = 'system' | 'file' | 'view' | 'window';
 
 type ManagedWindow = {
@@ -48,8 +52,9 @@ type ManagedWindow = {
 type WindowMap = Record<WindowId, ManagedWindow>;
 type WindowPhaseMap = Record<WindowId, WindowTransitionPhase>;
 
-const STORAGE_KEY = 'sushin-os.desktop.v4';
+const STORAGE_KEY = 'sushin-os.desktop.v5';
 const LEGACY_STORAGE_KEYS = [
+  'sushin-os.desktop.v4',
   'sushin-os.desktop.v3',
   'sushin-os.desktop.v2',
   'sushin-os.desktop.v1',
@@ -168,7 +173,7 @@ const desktopIcons: Array<{
 function readStoredDesktop(): {
   windows?: Partial<WindowMap>;
   theme?: Theme;
-  wallpaper?: Wallpaper;
+  wallpaperOverride?: Wallpaper | null;
   locale?: Locale;
 } | null {
   try {
@@ -177,7 +182,7 @@ function readStoredDesktop(): {
       return JSON.parse(stored) as {
         windows?: Partial<WindowMap>;
         theme?: Theme;
-        wallpaper?: Wallpaper;
+        wallpaperOverride?: Wallpaper | null;
         locale?: Locale;
       };
     }
@@ -194,7 +199,7 @@ function readStoredDesktop(): {
     };
     return {
       theme: parsed.theme,
-      wallpaper: parsed.wallpaper,
+      wallpaperOverride: parsed.wallpaper ?? null,
       locale: parsed.locale,
       windows: parsed.windows,
     };
@@ -221,7 +226,10 @@ export function SushinDesktop({
   const [windowPhases, setWindowPhases] =
     useState<WindowPhaseMap>(initialWindowPhases);
   const [theme, setTheme] = useState<Theme>('dark-aqua');
-  const [wallpaper, setWallpaper] = useState<Wallpaper>('night');
+  const [scheduledWallpaper, setScheduledWallpaper] =
+    useState<Wallpaper>('night');
+  const [wallpaperOverride, setWallpaperOverride] =
+    useState<Wallpaper | null>(null);
   const [locale, setLocale] = useState<Locale>('ru');
   const [isMobile, setIsMobile] = useState(false);
   const [clock, setClock] = useState({
@@ -252,7 +260,9 @@ export function SushinDesktop({
         setWindows(restoredWindows);
       }
       if (saved?.theme) setTheme(saved.theme);
-      if (saved?.wallpaper) setWallpaper(saved.wallpaper);
+      if (saved && 'wallpaperOverride' in saved) {
+        setWallpaperOverride(saved.wallpaperOverride ?? null);
+      }
       setLocale(resolveLocale(navigator.languages, saved?.locale));
       hasHydrated.current = true;
     }, 0);
@@ -264,12 +274,21 @@ export function SushinDesktop({
     try {
       window.localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ windows, theme, wallpaper, locale }),
+        JSON.stringify({ windows, theme, wallpaperOverride, locale }),
       );
     } catch {
       // The desktop remains fully usable when browser storage is unavailable.
     }
-  }, [locale, theme, wallpaper, windows]);
+  }, [locale, theme, wallpaperOverride, windows]);
+
+  useEffect(() => {
+    const syncWallpaper = () => {
+      setScheduledWallpaper(wallpaperForLocalHour(new Date().getHours()));
+    };
+    syncWallpaper();
+    const timer = window.setInterval(syncWallpaper, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -467,7 +486,8 @@ export function SushinDesktop({
     setWindows(initialWindows);
     setWindowPhases(initialWindowPhases);
     setTheme('dark-aqua');
-    setWallpaper('night');
+    setScheduledWallpaper(wallpaperForLocalHour(new Date().getHours()));
+    setWallpaperOverride(null);
     setActiveMenu(null);
   };
 
@@ -481,9 +501,17 @@ export function SushinDesktop({
   };
 
   const chooseWallpaper = (nextWallpaper: Wallpaper) => {
-    setWallpaper(nextWallpaper);
+    setWallpaperOverride(nextWallpaper);
     setActiveMenu(null);
   };
+
+  const chooseAutomaticWallpaper = () => {
+    setScheduledWallpaper(wallpaperForLocalHour(new Date().getHours()));
+    setWallpaperOverride(null);
+    setActiveMenu(null);
+  };
+
+  const wallpaper = wallpaperOverride ?? scheduledWallpaper;
 
   const visibleWindows = (Object.keys(windows) as WindowId[])
     .filter((id) => windows[id].open && !windows[id].minimized)
@@ -588,24 +616,7 @@ export function SushinDesktop({
           </button>
         </div>
 
-        <div
-          className="music-capsule"
-          title={dictionary.music.loading}
-        >
-          <span className="capsule-play" aria-hidden="true">
-            ▶
-          </span>
-          <div>
-            <b>{dictionary.music.title}</b>
-            <small>{dictionary.music.loading}</small>
-          </div>
-          <span className="capsule-eq" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <i />
-          </span>
-        </div>
+        <MusicUtility locale={locale} />
 
         <div className="menu-right">
           <button
@@ -720,21 +731,30 @@ export function SushinDesktop({
             <hr />
             <small>{dictionary.controls.wallpaper.toUpperCase()}</small>
             <button
-              aria-checked={wallpaper === 'day'}
+              aria-checked={wallpaperOverride === null}
+              onClick={chooseAutomaticWallpaper}
+              role="menuitemradio"
+              type="button"
+            >
+              <span>{wallpaperOverride === null ? '✓' : ''}</span>
+              {dictionary.controls.automatic}
+            </button>
+            <button
+              aria-checked={wallpaperOverride === 'day'}
               onClick={() => chooseWallpaper('day')}
               role="menuitemradio"
               type="button"
             >
-              <span>{wallpaper === 'day' ? '✓' : ''}</span>
+              <span>{wallpaperOverride === 'day' ? '✓' : ''}</span>
               {dictionary.controls.day}
             </button>
             <button
-              aria-checked={wallpaper === 'night'}
+              aria-checked={wallpaperOverride === 'night'}
               onClick={() => chooseWallpaper('night')}
               role="menuitemradio"
               type="button"
             >
-              <span>{wallpaper === 'night' ? '✓' : ''}</span>
+              <span>{wallpaperOverride === 'night' ? '✓' : ''}</span>
               {dictionary.controls.night}
             </button>
           </div>

@@ -28,6 +28,10 @@
 - Deterministic Box News history import, 130 static article routes, 74 owned
   covers, desktop pagination, self-canonical metadata, Article JSON-LD, RSS,
   sitemap, robots, manual unpublish, and a tested Netcup webhook bundle.
+- User-initiated Spotify embed with loading/ready/blocked states and a static
+  manual GitHub issue path that includes no visitor data.
+- Original generated day/night northern-island wallpapers, automatic local
+  04:00/17:00 schedule, and persisted day/night overrides.
 
 ### Changed
 
