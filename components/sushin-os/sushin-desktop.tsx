@@ -13,9 +13,10 @@ import {
   type WindowPosition,
   type WindowTransitionPhase,
 } from './desktop-window';
+import { CapabilitiesPanel } from './capabilities-panel';
 import { ContactPanel } from './contact-panel';
 import { CvPanel } from './cv-panel';
-import { ProjectsPreviewPanel } from './projects-preview-panel';
+import { ProjectsPanel } from './projects-panel';
 import { RandomFactPanel } from './random-fact-panel';
 import { SocialPanel } from './social-panel';
 import { SystemIcon } from './system-icon';
@@ -27,7 +28,8 @@ type WindowId =
   | 'cv'
   | 'projects'
   | 'social'
-  | 'contact';
+  | 'contact'
+  | 'skills';
 type Theme = 'aqua' | 'dark-aqua';
 type Wallpaper = 'day' | 'night';
 type MenuId = 'system' | 'file' | 'view' | 'window';
@@ -43,8 +45,8 @@ type ManagedWindow = {
 type WindowMap = Record<WindowId, ManagedWindow>;
 type WindowPhaseMap = Record<WindowId, WindowTransitionPhase>;
 
-const STORAGE_KEY = 'sushin-os.desktop.v2';
-const LEGACY_STORAGE_KEY = 'sushin-os.desktop.v1';
+const STORAGE_KEY = 'sushin-os.desktop.v3';
+const LEGACY_STORAGE_KEYS = ['sushin-os.desktop.v2', 'sushin-os.desktop.v1'];
 const WINDOW_MOTION_MS = 420;
 const WINDOW_CLOSE_MS = 240;
 
@@ -91,6 +93,13 @@ const initialWindows: WindowMap = {
     zIndex: 3,
     position: { x: 318, y: 150 },
   },
+  skills: {
+    open: false,
+    minimized: false,
+    maximized: false,
+    zIndex: 3,
+    position: { x: 240, y: 92 },
+  },
 };
 
 const initialWindowPhases: WindowPhaseMap = {
@@ -100,6 +109,7 @@ const initialWindowPhases: WindowPhaseMap = {
   projects: 'idle',
   social: 'idle',
   contact: 'idle',
+  skills: 'idle',
 };
 
 const desktopIcons: Array<{
@@ -135,7 +145,7 @@ const desktopIcons: Array<{
 ];
 
 function readStoredDesktop(): {
-  windows?: WindowMap;
+  windows?: Partial<WindowMap>;
   theme?: Theme;
   wallpaper?: Wallpaper;
   locale?: Locale;
@@ -144,24 +154,28 @@ function readStoredDesktop(): {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     if (stored) {
       return JSON.parse(stored) as {
-        windows?: WindowMap;
+        windows?: Partial<WindowMap>;
         theme?: Theme;
         wallpaper?: Wallpaper;
         locale?: Locale;
       };
     }
 
-    const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+    const legacy = LEGACY_STORAGE_KEYS.map((key) =>
+      window.localStorage.getItem(key),
+    ).find(Boolean);
     if (!legacy) return null;
     const parsed = JSON.parse(legacy) as {
       theme?: Theme;
       wallpaper?: Wallpaper;
       locale?: Locale;
+      windows?: Partial<WindowMap>;
     };
     return {
       theme: parsed.theme,
       wallpaper: parsed.wallpaper,
       locale: parsed.locale,
+      windows: parsed.windows,
     };
   } catch {
     return null;
@@ -197,13 +211,20 @@ export function SushinDesktop() {
     const hydrationTimer = window.setTimeout(() => {
       const saved = readStoredDesktop();
       if (saved?.windows) {
+        const restoredWindows = (Object.keys(initialWindows) as WindowId[]).reduce<WindowMap>(
+          (next, id) => {
+            next[id] = { ...initialWindows[id], ...saved.windows?.[id] };
+            return next;
+          },
+          {} as WindowMap,
+        );
         zCounter.current = Math.max(
           5,
-          ...Object.values(saved.windows).map(
+          ...Object.values(restoredWindows).map(
             (managedWindow) => managedWindow.zIndex,
           ),
         );
-        setWindows(saved.windows);
+        setWindows(restoredWindows);
       }
       if (saved?.theme) setTheme(saved.theme);
       if (saved?.wallpaper) setWallpaper(saved.wallpaper);
@@ -215,10 +236,14 @@ export function SushinDesktop() {
 
   useEffect(() => {
     if (!hasHydrated.current) return;
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ windows, theme, wallpaper, locale }),
-    );
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ windows, theme, wallpaper, locale }),
+      );
+    } catch {
+      // The desktop remains fully usable when browser storage is unavailable.
+    }
   }, [locale, theme, wallpaper, windows]);
 
   useEffect(() => {
@@ -442,6 +467,15 @@ export function SushinDesktop() {
   const factDockVisible = windows.fact.open && windows.fact.minimized;
   const newsDockIndex = factDockVisible ? 4 : 3;
   const dictionary = dictionaries[locale];
+  const windowMenuItems: readonly { id: WindowId; label: string }[] = [
+    { id: 'fact', label: dictionary.actions.randomFact },
+    { id: 'vladislav', label: dictionary.desktop.profile },
+    { id: 'cv', label: dictionary.desktop.cv },
+    { id: 'projects', label: dictionary.desktop.projects },
+    { id: 'skills', label: dictionary.desktop.skills },
+    { id: 'social', label: dictionary.desktop.social },
+    { id: 'contact', label: dictionary.desktop.write },
+  ];
 
   const dockMotionStyle = (index: number) => {
     const active = dockHoverIndex === index;
@@ -682,28 +716,19 @@ export function SushinDesktop() {
 
         {activeMenu === 'window' && (
           <div className="os-menu is-window" role="menu">
-            <button
-              onClick={() => openWindow('fact')}
-              role="menuitem"
-              type="button"
-            >
-              <span>
-                {windows.fact.open && !windows.fact.minimized ? '✓' : ''}
-              </span>
-              {dictionary.actions.randomFact}
-            </button>
-            <button
-              onClick={() => openWindow('vladislav')}
-              role="menuitem"
-              type="button"
-            >
-              <span>
-                {windows.vladislav.open && !windows.vladislav.minimized
-                  ? '✓'
-                  : ''}
-              </span>
-              {dictionary.desktop.profile}
-            </button>
+            {windowMenuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => openWindow(item.id)}
+                role="menuitem"
+                type="button"
+              >
+                <span>
+                  {windows[item.id].open && !windows[item.id].minimized ? '✓' : ''}
+                </span>
+                {item.label}
+              </button>
+            ))}
             <hr />
             <button onClick={resetDesktop} role="menuitem" type="button">
               <span />
@@ -845,7 +870,33 @@ export function SushinDesktop() {
             title={dictionary.career.projectsTitle}
             zIndex={windows.projects.zIndex}
           >
-            <ProjectsPreviewPanel locale={locale} />
+            <ProjectsPanel locale={locale} />
+          </DesktopWindow>
+        )}
+
+        {windows.skills.open && (
+          <DesktopWindow
+            active={frontWindowId === 'skills'}
+            className="skills-window"
+            desktopRef={desktopRef}
+            id="skills"
+            locale={locale}
+            maximized={windows.skills.maximized}
+            minimized={windows.skills.minimized}
+            mobile={isMobile}
+            onClose={() => closeWindow('skills')}
+            onFocus={() => focusWindow('skills')}
+            onMinimize={() => minimizeWindow('skills')}
+            onMove={(position) => updateWindow('skills', { position })}
+            onToggleMaximize={() =>
+              updateWindow('skills', { maximized: !windows.skills.maximized })
+            }
+            phase={windowPhases.skills}
+            position={windows.skills.position}
+            title={dictionary.desktop.skills}
+            zIndex={windows.skills.zIndex}
+          >
+            <CapabilitiesPanel locale={locale} />
           </DesktopWindow>
         )}
 
@@ -941,9 +992,12 @@ export function SushinDesktop() {
             <SystemIcon kind="write" size={58} />
           </button>
           <button
-            aria-label={`${dictionary.desktop.skills} — ${dictionary.desktop.next}`}
+            aria-label={dictionary.desktop.skills}
+            className={`${windows.skills.open ? 'is-running' : ''} ${windows.skills.minimized ? 'is-minimized-app' : ''}`}
             data-dock-index="2"
-            disabled
+            onBlur={() => setDockHoverIndex(null)}
+            onClick={() => openWindow('skills')}
+            onFocus={() => setDockHoverIndex(2)}
             onPointerEnter={() => setDockHoverIndex(2)}
             onPointerLeave={() => setDockHoverIndex(null)}
             style={dockMotionStyle(2)}

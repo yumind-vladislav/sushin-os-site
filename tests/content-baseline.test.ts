@@ -4,12 +4,18 @@ import { careerContent, socialChannels } from '../content/career-content';
 import { resolveLocale } from '../content/i18n';
 import { calculateAge, siteContent } from '../content/site-content';
 import { sushinFacts } from '../content/sushin-os-content';
+import { capabilityGroups, projectCards } from '../content/work-content';
+import { nextFactIndex } from '../lib/random-fact';
 
 void describe('Sushin OS content baseline', () => {
   void it('keeps a complete, stable fact pool', () => {
     assert.equal(sushinFacts.length, 20);
     assert.equal(new Set(sushinFacts.map(({ id }) => id)).size, 20);
-    assert.ok(sushinFacts.every(({ id, text }) => id.length > 0 && text.length > 0));
+    assert.ok(
+      sushinFacts.every(
+        ({ id, text }) => id.length > 0 && text.ru.length > 0 && text.en.length > 0,
+      ),
+    );
   });
 
   void it('keeps the confirmed public role', () => {
@@ -61,5 +67,45 @@ void describe('Sushin OS content baseline', () => {
       ],
     );
     assert.ok(socialChannels.every(({ href }) => !href.startsWith('/')));
+  });
+
+  void it('selects a different fact for every random boundary', () => {
+    for (let current = 0; current < sushinFacts.length; current += 1) {
+      for (const random of [0, 0.25, 0.5, 0.75, 0.999999]) {
+        const next = nextFactIndex(sushinFacts.length, current, random);
+        assert.notEqual(next, current);
+        assert.ok(next >= 0 && next < sushinFacts.length);
+      }
+    }
+  });
+
+  void it('keeps five approved project cards and exact metric language', () => {
+    assert.deepEqual(
+      projectCards.map(({ id }) => id),
+      ['yumind', 'yumind-bot', 'yumind-reborn', 'crypto', 'selected-client-work'],
+    );
+    const bot = projectCards.find(({ id }) => id === 'yumind-bot');
+    assert.match(bot?.proof.en ?? '', /96 user accounts plus 1 administrator/);
+    assert.match(bot?.proof.en ?? '', /not MAU/);
+    assert.match(bot?.proof.en ?? '', /7 August 2026, 14:33 Moscow time/);
+    const client = projectCards.find(({ id }) => id === 'selected-client-work');
+    assert.equal(client?.links.length, 0);
+    assert.match(client?.proof.en ?? '', /not published/);
+  });
+
+  void it('separates seven capability areas from their tool stack', () => {
+    assert.equal(capabilityGroups.length, 7);
+    assert.deepEqual(
+      capabilityGroups.map(({ id }) => id),
+      [
+        'project-delivery',
+        'product-work',
+        'ai-systems',
+        'development-workflow',
+        'knowledge-systems',
+        'research',
+        'creative-work',
+      ],
+    );
   });
 });

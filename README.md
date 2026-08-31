@@ -25,6 +25,8 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
 - confirmed bilingual profile content and dynamic age calculation;
 - approved portrait derivative, full About timeline, direct contact/social
   surfaces, and Project Manager CV in HTML, PDF, and DOCX formats;
+- five confirmed project cases, seven capability directions, and a bilingual
+  20-fact roulette with persisted sound preference and supported CV deep links;
 - shared loading, unavailable, malformed-content, empty and not-found states.
 
 The Music Utility is intentionally non-interactive in this checkpoint. A user-initiated capsule with visible Spotify Embed is scheduled for Phase 5.

@@ -20,6 +20,11 @@
   and PDF artifacts.
 - Optimized portrait derivative, full About timeline, seven direct social
   channels, and contact window without a lead form.
+- Five confirmed project cases with dated evidence and an intentionally
+  anonymized client-work card.
+- Seven grouped capability directions and the approved bilingual 20-fact pool
+  with non-repeat selection, persisted sound, reduced-motion behavior, and CV
+  deep links.
 
 ### Changed
 
@@ -31,3 +36,5 @@
   separate Netcup webhook ingestion service.
 - Replaced profile and desktop placeholders with confirmed career copy and
   direct navigation to CV, Projects, Telegram, and contact surfaces.
+- Enabled the What I Can Do Dock app and expanded Window navigation for all
+  implemented desktop surfaces.
