@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#f2f3f6"/>
+      <stop offset="1" stop-color="#c8cdd5"/>
+    </linearGradient>
+    <linearGradient id="paper-warm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffdf4"/>
+      <stop offset="0.62" stop-color="#eee9d9"/>
+      <stop offset="1" stop-color="#b9b29f"/>
+    </linearGradient>
+    <linearGradient id="aqua" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#75d4ff"/>
+      <stop offset="0.46" stop-color="#168cf5"/>
+      <stop offset="1" stop-color="#0751a7"/>
+    </linearGradient>
+    <linearGradient id="blue-deep" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#384fff"/>
+      <stop offset="0.55" stop-color="#2637ef"/>
+      <stop offset="1" stop-color="#111d91"/>
+    </linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd46a"/>
+      <stop offset="0.5" stop-color="#ff9f0a"/>
+      <stop offset="1" stop-color="#d75b00"/>
+    </linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff837b"/>
+      <stop offset="0.52" stop-color="#ff453a"/>
+      <stop offset="1" stop-color="#b91622"/>
+    </linearGradient>
+    <linearGradient id="graphite" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#59616b"/>
+      <stop offset="0.35" stop-color="#252a31"/>
+      <stop offset="1" stop-color="#080a0d"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f5f8fb"/>
+      <stop offset="0.22" stop-color="#aeb6c1"/>
+      <stop offset="0.52" stop-color="#5f6874"/>
+      <stop offset="0.76" stop-color="#d9dee4"/>
+      <stop offset="1" stop-color="#707986"/>
+    </linearGradient>
+    <radialGradient id="radar" cx="34%" cy="28%" r="76%">
+      <stop offset="0" stop-color="#b8ffff"/>
+      <stop offset="0.16" stop-color="#40dbe8"/>
+      <stop offset="0.52" stop-color="#087fff"/>
+      <stop offset="1" stop-color="#111838"/>
+    </radialGradient>
+    <radialGradient id="violet-orb" cx="35%" cy="28%" r="78%">
+      <stop offset="0" stop-color="#d9f4ff"/>
+      <stop offset="0.12" stop-color="#71cfff"/>
+      <stop offset="0.5" stop-color="#3f51d8"/>
+      <stop offset="1" stop-color="#170c38"/>
+    </radialGradient>
+    <filter id="object-shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="20" stdDeviation="18" flood-color="#02050a" flood-opacity="0.38"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#02050a" flood-opacity="0.34"/>
+    </filter>
+    <filter id="tight-shadow" x="-25%" y="-25%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="11" stdDeviation="9" flood-color="#05070b" flood-opacity="0.34"/>
+    </filter>
+    <filter id="cyan-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#6ffaff" flood-opacity="0.5"/>
+      <feDropShadow dx="0" dy="16" stdDeviation="13" flood-color="#02050a" flood-opacity="0.48"/>
+    </filter>
+  </defs>
+
+  <!-- Direction A: Catalina Object Fidelity -->
+  <symbol id="system-vladislav" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <circle cx="256" cy="240" r="190" fill="url(#aqua)" stroke="#f7fbff" stroke-width="14"/>
+      <circle cx="256" cy="240" r="151" fill="#eef7ff" stroke="#0a65bd" stroke-width="5"/>
+      <circle cx="256" cy="204" r="54" fill="#168cf5"/>
+      <path d="M144 358c18-72 61-106 112-106s94 34 112 106" fill="#168cf5"/>
+      <path d="M132 115c44-48 94-68 154-61" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="22" opacity=".46"/>
+      <rect x="188" y="401" width="136" height="22" rx="11" fill="#0d5eae" opacity=".7"/>
+    </g>
+  </symbol>
+
+  <symbol id="system-cv" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M116 52h214l78 78v304c0 17-13 30-30 30H116c-17 0-30-13-30-30V82c0-17 13-30 30-30z" fill="url(#paper)" stroke="#858d98" stroke-width="6"/>
+      <path d="M330 52v78h78" fill="#d7e9fb" stroke="#8a95a3" stroke-linejoin="round" stroke-width="6"/>
+      <rect x="130" y="125" width="150" height="24" rx="12" fill="#0a84ff"/>
+      <rect x="130" y="183" width="218" height="15" rx="7" fill="#aab2bd"/>
+      <rect x="130" y="223" width="190" height="15" rx="7" fill="#c1c7cf"/>
+      <rect x="130" y="263" width="226" height="15" rx="7" fill="#c1c7cf"/>
+      <rect x="130" y="303" width="142" height="15" rx="7" fill="#c1c7cf"/>
+      <g transform="rotate(-28 340 355)">
+        <rect x="315" y="271" width="48" height="166" rx="21" fill="url(#orange)" stroke="#ab5000" stroke-width="5"/>
+        <path d="M315 410h48l-24 52z" fill="#f4dcc0" stroke="#936137" stroke-width="4"/>
+      </g>
+    </g>
+  </symbol>
+
+  <symbol id="system-projects" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <rect x="47" y="78" width="418" height="350" rx="33" fill="url(#graphite)" stroke="#aab1ba" stroke-width="7"/>
+      <path d="M47 139h418" stroke="#8f98a4" stroke-width="5"/>
+      <circle cx="84" cy="109" r="12" fill="#ff5f57"/>
+      <circle cx="119" cy="109" r="12" fill="#febc2e"/>
+      <circle cx="154" cy="109" r="12" fill="#28c840"/>
+      <path d="M104 213l55 46-55 46" fill="none" stroke="#f4f7fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/>
+      <path d="M203 313h117" stroke="#70d6ff" stroke-linecap="round" stroke-width="20"/>
+      <rect x="103" y="352" width="210" height="13" rx="6" fill="#747d87"/>
+      <rect x="337" y="202" width="65" height="65" rx="11" fill="#087fff" opacity=".88"/>
+      <path d="M350 234h39M370 215v39" stroke="#fff" stroke-linecap="round" stroke-width="7"/>
+    </g>
+  </symbol>
+
+  <symbol id="system-facts" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <circle cx="256" cy="246" r="196" fill="url(#violet-orb)" stroke="#eef8ff" stroke-width="13"/>
+      <circle cx="256" cy="246" r="155" fill="none" stroke="#a6d9ff" stroke-width="5" opacity=".8"/>
+      <circle cx="256" cy="246" r="118" fill="#0e1d59" opacity=".72"/>
+      <path d="M256 104l39 112-39 172-39-172z" fill="#ffffff" opacity=".94"/>
+      <path d="M256 104l39 112-39 30z" fill="#ff5964"/>
+      <circle cx="256" cy="246" r="21" fill="#f8fbff" stroke="#172453" stroke-width="8"/>
+      <path d="M153 132l10 26 26 10-26 10-10 26-10-26-26-10 26-10z" fill="#fff"/>
+    </g>
+  </symbol>
+
+  <symbol id="system-news" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M95 99h325v337H95z" fill="#b4bac3" transform="translate(28 20) rotate(4 256 256)"/>
+      <rect x="82" y="74" width="350" height="354" rx="18" fill="url(#paper)" stroke="#7f8791" stroke-width="6"/>
+      <rect x="111" y="107" width="292" height="63" rx="5" fill="url(#red)"/>
+      <text x="132" y="149" fill="#fff" font-family="Arial, sans-serif" font-size="35" font-weight="700" letter-spacing="4">BOX NEWS</text>
+      <rect x="111" y="202" width="128" height="106" rx="5" fill="#9bcfff"/>
+      <rect x="265" y="202" width="138" height="17" rx="7" fill="#545b64"/>
+      <rect x="265" y="239" width="128" height="13" rx="6" fill="#a3a9b1"/>
+      <rect x="265" y="272" width="112" height="13" rx="6" fill="#a3a9b1"/>
+      <rect x="111" y="338" width="292" height="14" rx="7" fill="#a3a9b1"/>
+      <rect x="111" y="375" width="228" height="14" rx="7" fill="#b9bec5"/>
+    </g>
+  </symbol>
+
+  <symbol id="system-social" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M112 57h298c18 0 32 14 32 32v330c0 18-14 32-32 32H112z" fill="#b97e4d" stroke="#633b25" stroke-width="7"/>
+      <rect x="75" y="57" width="78" height="394" rx="17" fill="#714326" stroke="#4a2d1d" stroke-width="7"/>
+      <rect x="162" y="92" width="242" height="324" rx="17" fill="#fff5d8" stroke="#b79e75" stroke-width="5"/>
+      <circle cx="282" cy="217" r="70" fill="#dfb77a"/>
+      <text x="237" y="243" fill="#684020" font-family="Georgia, serif" font-size="86" font-weight="700">@</text>
+      <rect x="206" y="325" width="154" height="15" rx="7" fill="#b58d59"/>
+      <rect x="227" y="358" width="112" height="13" rx="6" fill="#ccb181"/>
+      <path d="M91 125h44M91 190h44M91 255h44M91 320h44M91 385h44" stroke="#d9c3a4" stroke-linecap="round" stroke-width="12"/>
+    </g>
+  </symbol>
+
+  <symbol id="system-about" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <circle cx="256" cy="246" r="187" fill="url(#aqua)" stroke="#f4fbff" stroke-width="14"/>
+      <circle cx="256" cy="246" r="145" fill="#eaf6ff" stroke="#0875da" stroke-width="5"/>
+      <circle cx="256" cy="203" r="50" fill="#1286f0"/>
+      <path d="M159 347c20-61 55-89 97-89s77 28 97 89" fill="#1286f0"/>
+      <rect x="202" y="384" width="108" height="24" rx="12" fill="#0965bf"/>
+    </g>
+  </symbol>
+
+  <symbol id="system-write" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <rect x="63" y="115" width="386" height="283" rx="29" fill="url(#paper)" stroke="#7b8591" stroke-width="7"/>
+      <path d="M78 143l178 143 178-143" fill="#dff0ff" stroke="#5e7184" stroke-linejoin="round" stroke-width="8"/>
+      <path d="M80 377l137-132M432 377L295 245" fill="none" stroke="#aeb8c4" stroke-width="7"/>
+      <g transform="rotate(-36 342 304)">
+        <path d="M325 188h48v203l-24 52-24-52z" fill="url(#blue-deep)" stroke="#132477" stroke-width="6"/>
+        <path d="M325 391h48l-24 52z" fill="#dfe9f5"/>
+        <circle cx="349" cy="408" r="7" fill="#2637ef"/>
+      </g>
+    </g>
+  </symbol>
+
+  <symbol id="system-skills" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M220 48h72l16 53 44 18 49-27 51 51-27 49 18 44 53 16v72l-53 16-18 44 27 49-51 51-49-27-44 18-16 53h-72l-16-53-44-18-49 27-51-51 27-49-18-44-53-16v-72l53-16 18-44-27-49 51-51 49 27 44-18z" fill="url(#metal)" stroke="#606975" stroke-width="7"/>
+      <circle cx="256" cy="288" r="117" fill="#6e7782" stroke="#edf1f5" stroke-width="11"/>
+      <circle cx="256" cy="288" r="64" fill="url(#graphite)" stroke="#31363d" stroke-width="8"/>
+      <path d="M219 288h74M256 251v74" stroke="#d9eefc" stroke-linecap="round" stroke-width="17"/>
+      <path d="M151 117c38-28 77-40 118-37" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="17" opacity=".52"/>
+    </g>
+  </symbol>
+
+  <!-- Direction B: Personal Editorial Objects -->
+  <symbol id="editorial-vladislav" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)" transform="rotate(-3 256 256)">
+      <rect x="84" y="57" width="344" height="398" rx="16" fill="url(#paper-warm)" stroke="#17191d" stroke-width="7"/>
+      <rect x="112" y="91" width="288" height="218" rx="7" fill="#2637ef"/>
+      <circle cx="256" cy="179" r="52" fill="#eef3ff"/>
+      <path d="M164 288c20-68 54-101 92-101s72 33 92 101" fill="#eef3ff"/>
+      <rect x="112" y="336" width="114" height="17" rx="8" fill="#17191d"/>
+      <rect x="112" y="371" width="184" height="12" rx="6" fill="#77746d"/>
+      <text x="310" y="408" fill="#2637ef" font-family="Arial, sans-serif" font-size="43" font-weight="800">VS</text>
+      <path d="M101 73l72-12" stroke="#ff453a" stroke-width="14"/>
+    </g>
+  </symbol>
+
+  <symbol id="editorial-cv" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)" transform="rotate(2 256 256)">
+      <path d="M75 129h145l32-42h188v330c0 21-17 38-38 38H113c-21 0-38-17-38-38z" fill="url(#blue-deep)" stroke="#121d83" stroke-width="7"/>
+      <path d="M122 101h248v277H122z" fill="url(#paper-warm)" stroke="#858174" stroke-width="5" transform="rotate(-5 246 239)"/>
+      <rect x="160" y="144" width="110" height="19" rx="9" fill="#191b20" transform="rotate(-5 215 153)"/>
+      <rect x="154" y="195" width="174" height="12" rx="6" fill="#aaa498" transform="rotate(-5 241 201)"/>
+      <rect x="151" y="232" width="147" height="12" rx="6" fill="#aaa498" transform="rotate(-5 224 238)"/>
+      <rect x="148" y="269" width="182" height="12" rx="6" fill="#aaa498" transform="rotate(-5 239 275)"/>
+      <circle cx="363" cy="342" r="56" fill="url(#red)" stroke="#fff4e7" stroke-width="6"/>
+      <text x="331" y="355" fill="#fff" font-family="Arial, sans-serif" font-size="34" font-weight="800">CV</text>
+      <path d="M88 143h339" stroke="#6981ff" stroke-width="11"/>
+    </g>
+  </symbol>
+
+  <symbol id="editorial-projects" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M69 93h374v330H69z" fill="#15171b" stroke="#06070a" stroke-width="7"/>
+      <rect x="98" y="126" width="185" height="129" fill="#2637ef"/>
+      <path d="M127 161l35 29-35 29M183 220h58" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="13"/>
+      <rect x="310" y="126" width="103" height="80" fill="#f0eadb"/>
+      <text x="328" y="176" fill="#16181d" font-family="Arial, sans-serif" font-size="24" font-weight="800">BUILD</text>
+      <circle cx="132" cy="327" r="19" fill="#ff453a"/>
+      <circle cx="256" cy="327" r="19" fill="#ffb22d"/>
+      <circle cx="380" cy="327" r="19" fill="#4dd37d"/>
+      <path d="M151 327h86M275 327h86" stroke="#b6bdc8" stroke-width="9"/>
+      <rect x="98" y="374" width="315" height="17" fill="#4c5159"/>
+      <path d="M69 93l46-32h249l79 32" fill="#30343b"/>
+    </g>
+  </symbol>
+
+  <symbol id="editorial-facts" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <circle cx="252" cy="250" r="194" fill="url(#blue-deep)" stroke="#eaf2ff" stroke-width="12"/>
+      <path d="M130 105h248l45 57-93 260H177L83 162z" fill="#2637ef" opacity=".55"/>
+      <path d="M166 145h184l31 40-70 190H201l-70-190z" fill="url(#paper-warm)" stroke="#17191d" stroke-width="7" transform="rotate(-4 256 260)"/>
+      <text x="215" y="303" fill="#17191d" font-family="Georgia, serif" font-size="145" font-weight="700" transform="rotate(-4 256 260)">?</text>
+      <path d="M120 165l59-45M353 398l47-51" stroke="#ff453a" stroke-linecap="round" stroke-width="18"/>
+      <path d="M117 336l26 9 9 26 9-26 26-9-26-9-9-26-9 26z" fill="#fff"/>
+    </g>
+  </symbol>
+
+  <symbol id="editorial-news" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M77 171l176-105 182 104-179 112z" fill="#f6f1e4" stroke="#17191d" stroke-linejoin="round" stroke-width="7"/>
+      <path d="M77 171l179 111v177L77 347z" fill="#ddd6c5" stroke="#17191d" stroke-linejoin="round" stroke-width="7"/>
+      <path d="M435 170L256 282v177l179-112z" fill="#c5bcaa" stroke="#17191d" stroke-linejoin="round" stroke-width="7"/>
+      <path d="M128 158l128-75 125 72-128 80z" fill="#fffdf6"/>
+      <rect x="153" y="124" width="202" height="39" fill="#ff453a" transform="rotate(1 254 143)"/>
+      <text x="174" y="152" fill="#fff" font-family="Arial, sans-serif" font-size="23" font-weight="800" letter-spacing="3">BOX NEWS</text>
+      <rect x="174" y="182" width="155" height="9" fill="#77736d" transform="rotate(-1 251 186)"/>
+      <path d="M256 282v177" stroke="#827a6b" stroke-width="5"/>
+      <path d="M77 171l179 111 179-112" fill="none" stroke="#fff" stroke-width="6" opacity=".5"/>
+    </g>
+  </symbol>
+
+  <symbol id="editorial-social" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M77 121h358v305H77z" fill="#e9e2d2" stroke="#17191d" stroke-width="7"/>
+      <path d="M106 92h298v44H106z" fill="#2637ef" stroke="#17191d" stroke-width="7"/>
+      <path d="M124 139h264v241H124z" fill="#fffdf4" stroke="#817b70" stroke-width="4"/>
+      <circle cx="177" cy="218" r="31" fill="#ff453a"/>
+      <circle cx="335" cy="218" r="31" fill="#2637ef"/>
+      <circle cx="256" cy="315" r="31" fill="#ffb02e"/>
+      <path d="M201 228l31 66M311 228l-31 66M208 218h96" stroke="#25272c" stroke-width="11"/>
+      <path d="M96 102v-33M150 102v-33M204 102v-33M258 102v-33M312 102v-33M366 102v-33M420 102v-33" stroke="#6d737c" stroke-linecap="round" stroke-width="13"/>
+      <text x="144" y="409" fill="#17191d" font-family="Arial, sans-serif" font-size="22" font-weight="800" letter-spacing="5">DIRECTORY</text>
+    </g>
+  </symbol>
+
+  <symbol id="editorial-about" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)" transform="rotate(-6 256 256)">
+      <circle cx="256" cy="253" r="184" fill="#f2ecdc" stroke="#17191d" stroke-width="8"/>
+      <circle cx="256" cy="253" r="145" fill="none" stroke="#2637ef" stroke-width="15"/>
+      <text x="180" y="279" fill="#17191d" font-family="Arial, sans-serif" font-size="86" font-weight="800">VS</text>
+      <path d="M147 327h218" stroke="#ff453a" stroke-width="17"/>
+      <text x="177" y="366" fill="#17191d" font-family="Arial, sans-serif" font-size="21" font-weight="700" letter-spacing="5">ABOUT</text>
+      <path d="M155 119c48-31 100-42 153-27" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="16" opacity=".72"/>
+    </g>
+  </symbol>
+
+  <symbol id="editorial-write" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M83 101h330v321H83z" fill="url(#paper-warm)" stroke="#17191d" stroke-width="7" transform="rotate(3 248 261)"/>
+      <rect x="121" y="146" width="143" height="18" fill="#2637ef" transform="rotate(3 192 155)"/>
+      <path d="M126 211h229M124 260h208M121 309h234" stroke="#aaa397" stroke-width="11" transform="rotate(3 238 260)"/>
+      <g transform="rotate(-39 349 279)">
+        <path d="M319 109h61v253l-30 70-31-70z" fill="url(#blue-deep)" stroke="#111d70" stroke-width="7"/>
+        <path d="M319 362h61l-30 70z" fill="#eff3f8" stroke="#6c7480" stroke-width="5"/>
+        <circle cx="350" cy="391" r="8" fill="#2637ef"/>
+        <path d="M334 140h31" stroke="#fff" stroke-width="8" opacity=".6"/>
+      </g>
+      <circle cx="112" cy="391" r="32" fill="#ff453a"/>
+    </g>
+  </symbol>
+
+  <symbol id="editorial-skills" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M70 96h372v329H70z" fill="#d9d2c2" stroke="#17191d" stroke-width="7"/>
+      <circle cx="122" cy="145" r="9" fill="#888174"/><circle cx="187" cy="145" r="9" fill="#888174"/><circle cx="252" cy="145" r="9" fill="#888174"/><circle cx="317" cy="145" r="9" fill="#888174"/><circle cx="382" cy="145" r="9" fill="#888174"/>
+      <circle cx="122" cy="211" r="9" fill="#888174"/><circle cx="187" cy="211" r="9" fill="#888174"/><circle cx="252" cy="211" r="9" fill="#888174"/><circle cx="317" cy="211" r="9" fill="#888174"/><circle cx="382" cy="211" r="9" fill="#888174"/>
+      <circle cx="122" cy="277" r="9" fill="#888174"/><circle cx="187" cy="277" r="9" fill="#888174"/><circle cx="252" cy="277" r="9" fill="#888174"/><circle cx="317" cy="277" r="9" fill="#888174"/><circle cx="382" cy="277" r="9" fill="#888174"/>
+      <path d="M135 346l65-65 32 32-65 65z" fill="#2637ef" stroke="#141f7f" stroke-width="6"/>
+      <path d="M248 339h144v54H248z" fill="#17191d"/>
+      <path d="M273 366h94" stroke="#fff" stroke-width="10"/>
+      <circle cx="347" cy="198" r="62" fill="url(#red)" stroke="#fff4e6" stroke-width="7"/>
+      <path d="M317 198h60M347 168v60" stroke="#fff" stroke-linecap="round" stroke-width="13"/>
+    </g>
+  </symbol>
+
+  <!-- Direction C: Instrument Panel -->
+  <symbol id="instrument-vladislav" viewBox="0 0 512 512">
+    <g filter="url(#cyan-glow)">
+      <circle cx="256" cy="250" r="190" fill="url(#graphite)" stroke="#9ca7b4" stroke-width="9"/>
+      <circle cx="256" cy="250" r="151" fill="url(#radar)" stroke="#162a49" stroke-width="7"/>
+      <path d="M256 99v302M105 250h302M149 143l214 214M363 143L149 357" stroke="#d8ffff" stroke-width="4" opacity=".32"/>
+      <circle cx="256" cy="207" r="46" fill="#dffcff" opacity=".88"/>
+      <path d="M168 348c18-64 49-95 88-95s70 31 88 95" fill="#dffcff" opacity=".88"/>
+      <circle cx="256" cy="250" r="173" fill="none" stroke="#65f5ff" stroke-dasharray="4 16" stroke-linecap="round" stroke-width="8"/>
+    </g>
+  </symbol>
+
+  <symbol id="instrument-cv" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M104 59h252l64 64v325H104z" fill="url(#graphite)" stroke="#aeb7c2" stroke-width="8"/>
+      <path d="M356 59v64h64" fill="#4f5965" stroke="#aeb7c2" stroke-width="7"/>
+      <rect x="139" y="142" width="245" height="63" rx="9" fill="#07141d" stroke="#5ceef5" stroke-width="5"/>
+      <text x="160" y="184" fill="#9affff" font-family="Menlo, monospace" font-size="30" font-weight="700">CV://DATA</text>
+      <rect x="139" y="244" width="165" height="12" rx="6" fill="#6ef6ff"/>
+      <rect x="139" y="283" width="222" height="12" rx="6" fill="#788491"/>
+      <rect x="139" y="322" width="194" height="12" rx="6" fill="#788491"/>
+      <rect x="139" y="374" width="78" height="38" rx="7" fill="#ff9f0a"/>
+      <circle cx="361" cy="392" r="18" fill="#5df3ff"/>
+    </g>
+  </symbol>
+
+  <symbol id="instrument-projects" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M54 118l47-54h310l47 54v293l-47 37H101l-47-37z" fill="url(#graphite)" stroke="#98a3af" stroke-width="8"/>
+      <rect x="91" y="130" width="330" height="200" rx="10" fill="#06151c" stroke="#42dce9" stroke-width="5"/>
+      <path d="M131 181l48 39-48 39M209 262h94" fill="none" stroke="#89fbff" stroke-linecap="round" stroke-linejoin="round" stroke-width="15"/>
+      <circle cx="344" cy="187" r="22" fill="#ff9f0a"/>
+      <path d="M344 209v62l-44 27M344 244l48 41" fill="none" stroke="#5cebf4" stroke-width="8"/>
+      <circle cx="300" cy="298" r="13" fill="#5cebf4"/><circle cx="392" cy="285" r="13" fill="#5cebf4"/>
+      <rect x="105" y="365" width="154" height="18" rx="9" fill="#586370"/>
+      <circle cx="365" cy="374" r="18" fill="#4dd37d"/>
+    </g>
+  </symbol>
+
+  <symbol id="instrument-facts" viewBox="0 0 512 512">
+    <g filter="url(#cyan-glow)">
+      <ellipse cx="256" cy="253" rx="202" ry="88" fill="none" stroke="#8b98ff" stroke-width="10" transform="rotate(28 256 253)"/>
+      <ellipse cx="256" cy="253" rx="202" ry="88" fill="none" stroke="#54efff" stroke-width="10" transform="rotate(-28 256 253)"/>
+      <circle cx="256" cy="253" r="128" fill="url(#violet-orb)" stroke="#eefcff" stroke-width="10"/>
+      <circle cx="256" cy="253" r="88" fill="#0d1538" opacity=".76"/>
+      <text x="218" y="298" fill="#fff" font-family="Georgia, serif" font-size="132" font-weight="700">?</text>
+      <circle cx="84" cy="156" r="18" fill="#ff9f0a"/>
+      <circle cx="424" cy="350" r="18" fill="#ff453a"/>
+      <circle cx="395" cy="119" r="14" fill="#62f5ff"/>
+    </g>
+  </symbol>
+
+  <symbol id="instrument-news" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M70 109h372v319H70z" fill="url(#graphite)" stroke="#9da7b3" stroke-width="8"/>
+      <rect x="99" y="142" width="314" height="69" rx="8" fill="#0a1118" stroke="#ff5a4f" stroke-width="5"/>
+      <text x="125" y="188" fill="#ff746b" font-family="Menlo, monospace" font-size="31" font-weight="700" letter-spacing="4">BOX://NEWS</text>
+      <rect x="99" y="246" width="121" height="123" rx="7" fill="#102d39" stroke="#53ecf6" stroke-width="4"/>
+      <path d="M122 335l30-43 24 26 21-37" fill="none" stroke="#68f7ff" stroke-width="8"/>
+      <rect x="252" y="249" width="161" height="13" rx="6" fill="#d1dae4"/>
+      <rect x="252" y="290" width="136" height="11" rx="5" fill="#697582"/>
+      <rect x="252" y="328" width="155" height="11" rx="5" fill="#697582"/>
+      <circle cx="399" cy="393" r="13" fill="#ff9f0a"/>
+    </g>
+  </symbol>
+
+  <symbol id="instrument-social" viewBox="0 0 512 512">
+    <g filter="url(#cyan-glow)">
+      <path d="M256 65l47 88h-94z" fill="url(#metal)" stroke="#5b6571" stroke-width="7"/>
+      <path d="M256 137v259" stroke="#aeb8c3" stroke-width="20"/>
+      <circle cx="256" cy="255" r="63" fill="url(#radar)" stroke="#d9ffff" stroke-width="8"/>
+      <circle cx="256" cy="255" r="18" fill="#fff"/>
+      <path d="M172 172c-47 47-47 123 0 170M340 172c47 47 47 123 0 170" fill="none" stroke="#57ebf5" stroke-linecap="round" stroke-width="13"/>
+      <path d="M124 124c-73 73-73 189 0 262M388 124c73 73 73 189 0 262" fill="none" stroke="#287fff" stroke-linecap="round" stroke-width="11" opacity=".86"/>
+      <path d="M190 426h132" stroke="#65717d" stroke-linecap="round" stroke-width="24"/>
+    </g>
+  </symbol>
+
+  <symbol id="instrument-about" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M256 52l164 76v256l-164 76-164-76V128z" fill="url(#graphite)" stroke="#9fa9b5" stroke-width="8"/>
+      <circle cx="256" cy="241" r="118" fill="#06161f" stroke="#5ceef7" stroke-width="6"/>
+      <circle cx="256" cy="209" r="40" fill="#aafcff"/>
+      <path d="M177 324c17-55 43-83 79-83s62 28 79 83" fill="#aafcff"/>
+      <path d="M134 143h58M320 143h58M134 359h58M320 359h58" stroke="#ff9f0a" stroke-width="9"/>
+      <text x="212" y="408" fill="#6ff5ff" font-family="Menlo, monospace" font-size="24" font-weight="700">ID:VS</text>
+    </g>
+  </symbol>
+
+  <symbol id="instrument-write" viewBox="0 0 512 512">
+    <g filter="url(#object-shadow)">
+      <path d="M72 153h368v230H72z" fill="url(#graphite)" stroke="#9ca6b2" stroke-width="8"/>
+      <path d="M91 170l165 123 165-123" fill="#0b2230" stroke="#65eef7" stroke-width="8"/>
+      <path d="M93 365l120-106M419 365L299 259" fill="none" stroke="#4c6979" stroke-width="7"/>
+      <circle cx="365" cy="121" r="70" fill="#101820" stroke="#58edf6" stroke-width="8"/>
+      <path d="M365 80v82M324 121h82" stroke="#a9fdff" stroke-linecap="round" stroke-width="14"/>
+      <circle cx="114" cy="412" r="18" fill="#ff9f0a"/>
+      <circle cx="398" cy="412" r="18" fill="#4dd37d"/>
+    </g>
+  </symbol>
+
+  <symbol id="instrument-skills" viewBox="0 0 512 512">
+    <g filter="url(#cyan-glow)">
+      <path d="M256 56l159 92v184l-159 92-159-92V148z" fill="url(#graphite)" stroke="#a4aeba" stroke-width="9"/>
+      <path d="M256 95l126 73v145l-126 73-126-73V168z" fill="#07151d" stroke="#58ebf5" stroke-width="5"/>
+      <circle cx="256" cy="240" r="75" fill="none" stroke="#6cf4fb" stroke-width="18" stroke-dasharray="34 15"/>
+      <circle cx="256" cy="240" r="37" fill="#ff9f0a" stroke="#ffe3a8" stroke-width="7"/>
+      <path d="M182 346h148" stroke="#66727f" stroke-linecap="round" stroke-width="16"/>
+      <circle cx="162" cy="176" r="13" fill="#ff453a"/>
+      <circle cx="350" cy="176" r="13" fill="#4dd37d"/>
+      <path d="M256 120v45M151 301l39-23M361 301l-39-23" stroke="#d9ffff" stroke-width="9"/>
+    </g>
+  </symbol>
+</svg>
