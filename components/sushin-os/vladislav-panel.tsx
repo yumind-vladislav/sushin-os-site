@@ -1,49 +1,50 @@
-'use client';
-
-import { vladislavProfile } from '@/content/sushin-os-content';
+import { dictionaries, type Locale } from '@/content/i18n';
+import { calculateAge, siteContent } from '@/content/site-content';
 import { SystemIcon } from './system-icon';
 
 type VladislavPanelProps = {
+  locale: Locale;
   onOpenFact: () => void;
 };
 
-export function VladislavPanel({ onOpenFact }: VladislavPanelProps) {
+export function VladislavPanel({ locale, onOpenFact }: VladislavPanelProps) {
+  const dictionary = dictionaries[locale];
+  const profile = siteContent.profile;
+  const age = calculateAge(profile.dateOfBirth);
+
   return (
     <div className="profile-panel">
       <div className="profile-portrait-slot">
         <SystemIcon kind="vladislav" size={118} />
-        <span>PHOTO SLOT</span>
-        <small>AWAITING SOURCE</small>
+        <span>{dictionary.profile.openToWork}</span>
+        <small>31.05.2000</small>
       </div>
 
       <article className="profile-copy">
-        <span className="profile-eyebrow">PROFILE · CONTENT-SAFE PREVIEW</span>
-        <h2>{vladislavProfile.name}</h2>
-        <p className="profile-role">{vladislavProfile.role}</p>
-        <p className="profile-intro">{vladislavProfile.intro}</p>
+        <span className="profile-eyebrow">{dictionary.profile.eyebrow}</span>
+        <h2>{profile.name[locale]}</h2>
+        <p className="profile-role">{profile.role[locale]}</p>
+        <p className="profile-intro">{profile.summary[locale]}</p>
 
         <dl className="profile-meta">
           <div>
-            <dt>BIRTHDAY</dt>
-            <dd>{vladislavProfile.birthdayLabel}</dd>
+            <dt>{dictionary.profile.birthday}</dt>
+            <dd>
+              <time dateTime={profile.dateOfBirth}>31.05.2000</time>
+            </dd>
           </div>
           <div>
-            <dt>AGE</dt>
-            <dd>{vladislavProfile.ageLabel}</dd>
+            <dt>{dictionary.profile.age}</dt>
+            <dd>{age}</dd>
+          </div>
+          <div>
+            <dt>{dictionary.profile.status}</dt>
+            <dd>{profile.availability[locale]}</dd>
           </div>
         </dl>
 
-        <ul className="content-status" aria-label="Статус контента профиля">
-          {vladislavProfile.contentStatus.map((item) => (
-            <li key={item.label}>
-              <span>{item.label}</span>
-              <b>{item.value}</b>
-            </li>
-          ))}
-        </ul>
-
         <button className="aqua-button" onClick={onOpenFact} type="button">
-          Вернуться к Random Fact
+          {dictionary.actions.backToFacts}
         </button>
       </article>
     </div>

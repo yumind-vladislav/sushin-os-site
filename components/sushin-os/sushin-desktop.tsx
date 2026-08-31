@@ -4,6 +4,11 @@ import type { CSSProperties } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type { IconKind } from '@/content/icon-manifest';
 import {
+  dictionaries,
+  resolveLocale,
+  type Locale,
+} from '@/content/i18n';
+import {
   DesktopWindow,
   type WindowPosition,
   type WindowTransitionPhase,
@@ -65,7 +70,7 @@ const desktopIcons: Array<{
   { id: 'projects', label: 'Projects', kind: 'projects', align: 'left' },
   { id: 'social', label: 'Social Media', kind: 'social', align: 'left' },
   {
-    id: 'vladislav',
+    id: 'profile',
     label: 'Vladislav',
     kind: 'vladislav',
     window: 'vladislav',
@@ -78,6 +83,7 @@ function readStoredDesktop(): {
   windows?: WindowMap;
   theme?: Theme;
   wallpaper?: Wallpaper;
+  locale?: Locale;
 } | null {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -86,6 +92,7 @@ function readStoredDesktop(): {
           windows?: WindowMap;
           theme?: Theme;
           wallpaper?: Wallpaper;
+          locale?: Locale;
         })
       : null;
   } catch {
@@ -108,6 +115,7 @@ export function SushinDesktop() {
     useState<WindowPhaseMap>(initialWindowPhases);
   const [theme, setTheme] = useState<Theme>('dark-aqua');
   const [wallpaper, setWallpaper] = useState<Wallpaper>('night');
+  const [locale, setLocale] = useState<Locale>('ru');
   const [isMobile, setIsMobile] = useState(false);
   const [clock, setClock] = useState({
     time: '--:--',
@@ -131,6 +139,7 @@ export function SushinDesktop() {
       }
       if (saved?.theme) setTheme(saved.theme);
       if (saved?.wallpaper) setWallpaper(saved.wallpaper);
+      setLocale(resolveLocale(navigator.languages, saved?.locale));
       hasHydrated.current = true;
     }, 0);
     return () => window.clearTimeout(hydrationTimer);
@@ -140,9 +149,14 @@ export function SushinDesktop() {
     if (!hasHydrated.current) return;
     window.localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ windows, theme, wallpaper }),
+      JSON.stringify({ windows, theme, wallpaper, locale }),
     );
-  }, [theme, wallpaper, windows]);
+  }, [locale, theme, wallpaper, windows]);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.documentElement.dataset.uiLocale = locale;
+  }, [locale]);
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 700px)');
@@ -176,12 +190,13 @@ export function SushinDesktop() {
   }, []);
 
   useEffect(() => {
-    const formatter = new Intl.DateTimeFormat('en-GB', {
+    const language = locale === 'ru' ? 'ru-RU' : 'en-GB';
+    const formatter = new Intl.DateTimeFormat(language, {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
     });
-    const dateFormatter = new Intl.DateTimeFormat('en-GB', {
+    const dateFormatter = new Intl.DateTimeFormat(language, {
       weekday: 'short',
       day: '2-digit',
       month: 'short',
@@ -199,7 +214,7 @@ export function SushinDesktop() {
     updateClock();
     const timer = window.setInterval(updateClock, 30_000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     const closeMenu = (event: globalThis.PointerEvent) => {
@@ -358,6 +373,7 @@ export function SushinDesktop() {
   const frontWindowId = visibleWindows[0] ?? null;
   const factDockVisible = windows.fact.open && windows.fact.minimized;
   const newsDockIndex = factDockVisible ? 4 : 3;
+  const dictionary = dictionaries[locale];
 
   const dockMotionStyle = (index: number) => {
     const active = dockHoverIndex === index;
@@ -371,12 +387,15 @@ export function SushinDesktop() {
     const active = item.window
       ? windows[item.window].open && !windows[item.window].minimized
       : false;
+    const label = dictionary.desktop[
+      item.id as 'cv' | 'projects' | 'social' | 'profile' | 'news'
+    ];
     return (
       <button
         aria-label={
           item.window
-            ? `Открыть ${item.label}`
-            : `${item.label} — следующий этап`
+            ? `${dictionary.desktop.open} ${label}`
+            : `${label} — ${dictionary.desktop.next}`
         }
         className={`desktop-icon ${active ? 'is-open' : ''}`}
         disabled={!item.window}
@@ -385,19 +404,22 @@ export function SushinDesktop() {
         type="button"
       >
         <SystemIcon kind={item.kind} size={72} />
-        <span>{item.label}</span>
-        {!item.window && <small>NEXT</small>}
+        <span>{label}</span>
+        {!item.window && <small>{dictionary.desktop.next}</small>}
       </button>
     );
   };
 
   return (
-    <main className={`sushin-desktop theme-${theme} wallpaper-${wallpaper}`}>
+    <main
+      className={`sushin-desktop theme-${theme} wallpaper-${wallpaper}`}
+      data-locale={locale}
+    >
       <header className="os-menubar" ref={menuBarRef}>
         <div className="menu-left">
           <button
             aria-expanded={activeMenu === 'system'}
-            aria-label="Меню Sushin OS"
+            aria-label={dictionary.controls.osMenu}
             className="system-menu-trigger"
             onClick={() => toggleMenu('system')}
             type="button"
@@ -410,7 +432,7 @@ export function SushinDesktop() {
             onClick={() => toggleMenu('system')}
             type="button"
           >
-            Vladislav
+            {dictionary.menus.app}
           </button>
           <button
             aria-expanded={activeMenu === 'file'}
@@ -418,7 +440,7 @@ export function SushinDesktop() {
             onClick={() => toggleMenu('file')}
             type="button"
           >
-            File
+            {dictionary.menus.file}
           </button>
           <button
             aria-expanded={activeMenu === 'view'}
@@ -426,7 +448,7 @@ export function SushinDesktop() {
             onClick={() => toggleMenu('view')}
             type="button"
           >
-            View
+            {dictionary.menus.view}
           </button>
           <button
             aria-expanded={activeMenu === 'window'}
@@ -434,20 +456,20 @@ export function SushinDesktop() {
             onClick={() => toggleMenu('window')}
             type="button"
           >
-            Window
+            {dictionary.menus.window}
           </button>
         </div>
 
         <div
           className="music-capsule"
-          title="Spotify Embed — следующий вертикальный срез"
+          title={dictionary.music.loading}
         >
           <span className="capsule-play" aria-hidden="true">
             ▶
           </span>
           <div>
-            <b>MUSIC UTILITY</b>
-            <small>SPOTIFY · NEXT SLICE</small>
+            <b>{dictionary.music.title}</b>
+            <small>{dictionary.music.loading}</small>
           </div>
           <span className="capsule-eq" aria-hidden="true">
             <i />
@@ -459,8 +481,18 @@ export function SushinDesktop() {
 
         <div className="menu-right">
           <button
+            aria-label={dictionary.controls.language}
+            className="language-toggle"
+            onClick={() => setLocale((current) => (current === 'ru' ? 'en' : 'ru'))}
+            type="button"
+          >
+            {dictionary.localeName}
+          </button>
+          <button
             aria-label={
-              theme === 'dark-aqua' ? 'Включить Aqua' : 'Включить Dark Aqua'
+              theme === 'dark-aqua'
+                ? dictionary.controls.switchToAqua
+                : dictionary.controls.switchToDark
             }
             className="appearance-toggle"
             onClick={() =>
@@ -487,7 +519,7 @@ export function SushinDesktop() {
               type="button"
             >
               <span />
-              About Vladislav
+              {dictionary.actions.about}
             </button>
             <button
               onClick={() => openWindow('fact')}
@@ -495,12 +527,12 @@ export function SushinDesktop() {
               type="button"
             >
               <span />
-              Random Fact
+              {dictionary.actions.randomFact}
             </button>
             <hr />
             <button onClick={resetDesktop} role="menuitem" type="button">
               <span />
-              Reset Sushin OS
+              {dictionary.actions.resetOs}
             </button>
           </div>
         )}
@@ -513,7 +545,7 @@ export function SushinDesktop() {
               type="button"
             >
               <span />
-              Open Random Fact
+              {dictionary.actions.openFact}
             </button>
             <button
               onClick={() => openWindow('vladislav')}
@@ -521,7 +553,7 @@ export function SushinDesktop() {
               type="button"
             >
               <span />
-              Open Vladislav
+              {dictionary.actions.openProfile}
             </button>
             <hr />
             <button
@@ -531,14 +563,14 @@ export function SushinDesktop() {
               type="button"
             >
               <span />
-              Close Front Window
+              {dictionary.actions.closeFront}
             </button>
           </div>
         )}
 
         {activeMenu === 'view' && (
           <div className="os-menu is-view" role="menu">
-            <small>APPEARANCE</small>
+            <small>{dictionary.controls.appearance.toUpperCase()}</small>
             <button
               aria-checked={theme === 'aqua'}
               onClick={() => chooseTheme('aqua')}
@@ -546,7 +578,7 @@ export function SushinDesktop() {
               type="button"
             >
               <span>{theme === 'aqua' ? '✓' : ''}</span>
-              Aqua
+              {dictionary.controls.aqua}
             </button>
             <button
               aria-checked={theme === 'dark-aqua'}
@@ -555,10 +587,10 @@ export function SushinDesktop() {
               type="button"
             >
               <span>{theme === 'dark-aqua' ? '✓' : ''}</span>
-              Dark Aqua
+              {dictionary.controls.darkAqua}
             </button>
             <hr />
-            <small>WALLPAPER · LOCAL REFERENCE</small>
+            <small>{dictionary.controls.wallpaper.toUpperCase()}</small>
             <button
               aria-checked={wallpaper === 'day'}
               onClick={() => chooseWallpaper('day')}
@@ -566,7 +598,7 @@ export function SushinDesktop() {
               type="button"
             >
               <span>{wallpaper === 'day' ? '✓' : ''}</span>
-              Catalina Day
+              {dictionary.controls.day}
             </button>
             <button
               aria-checked={wallpaper === 'night'}
@@ -575,7 +607,7 @@ export function SushinDesktop() {
               type="button"
             >
               <span>{wallpaper === 'night' ? '✓' : ''}</span>
-              Catalina Night
+              {dictionary.controls.night}
             </button>
           </div>
         )}
@@ -590,7 +622,7 @@ export function SushinDesktop() {
               <span>
                 {windows.fact.open && !windows.fact.minimized ? '✓' : ''}
               </span>
-              Random Fact
+              {dictionary.actions.randomFact}
             </button>
             <button
               onClick={() => openWindow('vladislav')}
@@ -602,12 +634,12 @@ export function SushinDesktop() {
                   ? '✓'
                   : ''}
               </span>
-              Vladislav
+              {dictionary.desktop.profile}
             </button>
             <hr />
             <button onClick={resetDesktop} role="menuitem" type="button">
               <span />
-              Reset Desktop
+              {dictionary.actions.resetDesktop}
             </button>
           </div>
         )}
@@ -626,7 +658,7 @@ export function SushinDesktop() {
         </div>
 
         <button
-          aria-label="Открыть Random Fact"
+          aria-label={dictionary.actions.openFact}
           className={`desktop-fact-object ${windows.fact.open && !windows.fact.minimized ? 'is-open' : ''}`}
           onClick={() => openWindow('fact')}
           type="button"
@@ -634,7 +666,7 @@ export function SushinDesktop() {
           <span className="desktop-fact-ring" aria-hidden="true" />
           <SystemIcon kind="facts" size={106} />
           <strong>Random Fact</strong>
-          <small>CLICK TO OPEN</small>
+          <small>{dictionary.desktop.open.toUpperCase()}</small>
         </button>
 
         {windows.fact.open && (
@@ -643,6 +675,7 @@ export function SushinDesktop() {
             className="fact-window"
             desktopRef={desktopRef}
             id="fact"
+            locale={locale}
             maximized={windows.fact.maximized}
             minimized={windows.fact.minimized}
             mobile={isMobile}
@@ -658,7 +691,7 @@ export function SushinDesktop() {
             title="Random Fact"
             zIndex={windows.fact.zIndex}
           >
-            <RandomFactPanel />
+            <RandomFactPanel locale={locale} />
           </DesktopWindow>
         )}
 
@@ -668,6 +701,7 @@ export function SushinDesktop() {
             className="profile-window"
             desktopRef={desktopRef}
             id="vladislav"
+            locale={locale}
             maximized={windows.vladislav.maximized}
             minimized={windows.vladislav.minimized}
             mobile={isMobile}
@@ -682,17 +716,19 @@ export function SushinDesktop() {
             }
             phase={windowPhases.vladislav}
             position={windows.vladislav.position}
-            title="Vladislav"
+            title={dictionary.desktop.profile}
             zIndex={windows.vladislav.zIndex}
           >
-            <VladislavPanel onOpenFact={() => openWindow('fact')} />
+            <VladislavPanel locale={locale} onOpenFact={() => openWindow('fact')} />
           </DesktopWindow>
         )}
 
         <nav aria-label="Sushin OS Dock" className="os-dock">
           <button
             aria-label={
-              windows.vladislav.minimized ? 'Восстановить About' : 'About'
+              windows.vladislav.minimized
+                ? dictionary.actions.restoreAbout
+                : dictionary.actions.about
             }
             className={`${windows.vladislav.open ? 'is-running' : ''} ${windows.vladislav.minimized ? 'is-minimized-app' : ''}`}
             data-dock-index="0"
@@ -705,12 +741,14 @@ export function SushinDesktop() {
             type="button"
           >
             <span className="dock-tooltip">
-              {windows.vladislav.minimized ? 'Restore About' : 'About'}
+              {windows.vladislav.minimized
+                ? dictionary.actions.restoreAbout
+                : dictionary.actions.about}
             </span>
             <SystemIcon kind="about" size={58} />
           </button>
           <button
-            aria-label="Write to Me — следующий этап"
+            aria-label={`${dictionary.desktop.write} — ${dictionary.desktop.next}`}
             data-dock-index="1"
             disabled
             onPointerEnter={() => setDockHoverIndex(1)}
@@ -718,11 +756,11 @@ export function SushinDesktop() {
             style={dockMotionStyle(1)}
             type="button"
           >
-            <span className="dock-tooltip">Write to Me · next</span>
+            <span className="dock-tooltip">{dictionary.desktop.write}</span>
             <SystemIcon kind="write" size={58} />
           </button>
           <button
-            aria-label="What I Can Do — следующий этап"
+            aria-label={`${dictionary.desktop.skills} — ${dictionary.desktop.next}`}
             data-dock-index="2"
             disabled
             onPointerEnter={() => setDockHoverIndex(2)}
@@ -730,13 +768,13 @@ export function SushinDesktop() {
             style={dockMotionStyle(2)}
             type="button"
           >
-            <span className="dock-tooltip">What I Can Do · next</span>
+            <span className="dock-tooltip">{dictionary.desktop.skills}</span>
             <SystemIcon kind="skills" size={58} />
           </button>
           <span className="dock-separator" aria-hidden="true" />
           {factDockVisible && (
             <button
-              aria-label="Восстановить Random Fact"
+              aria-label={dictionary.actions.restoreFact}
               className="is-running is-minimized-app"
               data-dock-index="3"
               onBlur={() => setDockHoverIndex(null)}
@@ -747,12 +785,12 @@ export function SushinDesktop() {
               style={dockMotionStyle(3)}
               type="button"
             >
-              <span className="dock-tooltip">Restore Random Fact</span>
+              <span className="dock-tooltip">{dictionary.actions.restoreFact}</span>
               <SystemIcon kind="facts" size={54} />
             </button>
           )}
           <button
-            aria-label="Box News — следующий этап"
+            aria-label={`${dictionary.desktop.news} — ${dictionary.desktop.next}`}
             data-dock-index={newsDockIndex}
             disabled
             onPointerEnter={() => setDockHoverIndex(newsDockIndex)}
@@ -760,13 +798,13 @@ export function SushinDesktop() {
             style={dockMotionStyle(newsDockIndex)}
             type="button"
           >
-            <span className="dock-tooltip">Box News · next</span>
+            <span className="dock-tooltip">{dictionary.desktop.news}</span>
             <SystemIcon kind="news" size={54} />
           </button>
         </nav>
 
         <span className="wallpaper-credit">
-          CATALINA {wallpaper.toUpperCase()} REFERENCE · LOCALHOST ONLY
+          {dictionary.desktop.wallpaperCredit}
         </span>
       </div>
     </main>

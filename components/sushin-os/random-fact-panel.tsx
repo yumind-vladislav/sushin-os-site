@@ -2,6 +2,7 @@
 
 import { Volume2, VolumeX } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { dictionaries, type Locale } from '@/content/i18n';
 import { sushinFacts } from '@/content/sushin-os-content';
 
 const rouletteDelays = [45, 95, 155, 225, 305, 395, 495, 610, 740];
@@ -32,12 +33,13 @@ function playFactSound() {
   oscillator.addEventListener('ended', () => void context.close());
 }
 
-export function RandomFactPanel() {
+export function RandomFactPanel({ locale }: { locale: Locale }) {
   const [factIndex, setFactIndex] = useState(0);
   const [isRolling, setIsRolling] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const timersRef = useRef(new Set<number>());
   const fact = sushinFacts[factIndex];
+  const dictionary = dictionaries[locale];
 
   useEffect(() => {
     const timers = timersRef.current;
@@ -75,11 +77,15 @@ export function RandomFactPanel() {
           {String(factIndex + 1).padStart(2, '0')} / {String(sushinFacts.length).padStart(2, '0')}
         </b>
         <button
-          aria-label={soundEnabled ? 'Выключить звук' : 'Включить звук'}
+          aria-label={
+            soundEnabled ? dictionary.actions.soundOff : dictionary.actions.soundOn
+          }
           aria-pressed={!soundEnabled}
           className="fact-sound-button"
           onClick={() => setSoundEnabled((current) => !current)}
-          title={soundEnabled ? 'Выключить звук' : 'Включить звук'}
+          title={
+            soundEnabled ? dictionary.actions.soundOff : dictionary.actions.soundOn
+          }
           type="button"
         >
           {soundEnabled ? <Volume2 aria-hidden="true" /> : <VolumeX aria-hidden="true" />}
@@ -91,7 +97,7 @@ export function RandomFactPanel() {
         aria-live={isRolling ? 'off' : 'polite'}
         className={`fact-copy${isRolling ? ' is-rolling' : ''}`}
       >
-        <p>{fact.text}</p>
+        <p lang="ru">{fact.text}</p>
       </article>
 
       <div className="fact-controls">
@@ -101,7 +107,9 @@ export function RandomFactPanel() {
           onClick={showRandomFact}
           type="button"
         >
-          {isRolling ? 'Выбираем…' : 'Следующий факт'}
+          {isRolling
+            ? dictionary.actions.choosingFact
+            : dictionary.actions.nextFact}
         </button>
       </div>
     </div>

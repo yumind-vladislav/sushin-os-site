@@ -4,6 +4,8 @@
 
 ### Added
 
+- Typed RU/EN dictionaries, locale persistence and browser-locale selection.
+- Versioned confirmed profile content plus shared route/service states.
 - A Node test runner for typed content invariants; the pre-migration baseline
   now passes `npm test`, `npm run lint`, and `npm run build`.
 - Public standalone repository `yumind-vladislav/sushin-os-site` with the
@@ -17,7 +19,9 @@
 
 ### Changed
 
+- Migrated the build from Vinext/Vite/Cloudflare to standard Next.js App Router
+  static export for the Layero handoff.
 - Alternative Reality is removed from the first public release.
-- `/icon-studies` is designated for removal from the public build.
+- `/icon-studies` and its public route components are removed.
 - Target architecture is standard Next.js static generation for Layero, with a
   separate Netcup webhook ingestion service.

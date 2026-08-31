@@ -21,8 +21,30 @@ const localhostExtensionErrorGuard = `
 })();
 `;
 
+const localeBootstrap = `
+(() => {
+  const storageKey = 'sushin-os.desktop.v1';
+  let savedLocale = null;
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+    savedLocale = saved?.locale;
+  } catch {}
+
+  const browserLocale = (navigator.languages || [navigator.language]).some(
+    (language) => String(language).toLowerCase().startsWith('ru')
+  ) ? 'ru' : 'en';
+  const locale = savedLocale === 'ru' || savedLocale === 'en'
+    ? savedLocale
+    : browserLocale;
+
+  document.documentElement.lang = locale;
+  document.documentElement.dataset.uiLocale = locale;
+})();
+`;
+
 export const metadata: Metadata = {
-  title: 'Sushin OS — Vladislav Sushin',
+  title: 'Sushin OS — Владислав Сушин / Vladislav Sushin',
   description:
     'Интерактивный персональный рабочий стол Владислава Сушина в визуальной памяти macOS Catalina.',
   icons: { icon: '/favicon.svg' },
@@ -34,8 +56,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: localeBootstrap }} />
         <script dangerouslySetInnerHTML={{ __html: localhostExtensionErrorGuard }} />
       </head>
       <body>{children}</body>

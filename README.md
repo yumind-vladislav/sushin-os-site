@@ -6,8 +6,8 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
 
 ## Routes
 
-- `/` — current production-shaped desktop slice;
-- `/icon-studies` — archived comparison sheet and recorded icon decision.
+- `/` — statically generated Sushin OS desktop;
+- framework-native 404 — includes the removed `/icon-studies` route.
 
 ## Current slice
 
@@ -18,9 +18,13 @@ Standalone localhost-first implementation of the Sushin OS personal site. The ed
 - one-window mobile mode with internal window scrolling;
 - Interaction Pass 01: phased open, close, minimize, restore and maximize motion, isolated single-item Dock response, functional System/File/View/Window menus and persisted Catalina day/night state;
 - a reduced-motion path for window, Dock, menu and wallpaper transitions;
-- explicit placeholders for unconfirmed biography, photo and birth year.
+- standard Next.js App Router with static export output in `out/`;
+- typed RU/EN UI foundation with browser-language default and persisted manual
+  override;
+- confirmed bilingual profile content and dynamic age calculation;
+- shared loading, unavailable, malformed-content, empty and not-found states.
 
-The Music Utility is intentionally non-interactive in this checkpoint. A user-initiated capsule with visible Spotify Embed is the next integration slice.
+The Music Utility is intentionally non-interactive in this checkpoint. A user-initiated capsule with visible Spotify Embed is scheduled for Phase 5.
 
 ## Canonical implementation brief
 
@@ -39,6 +43,7 @@ npm test
 npm run dev
 npm run lint
 npm run build
+npm start # preview the generated out/ directory
 ```
 
 No deployment or production publishing is configured or approved.
@@ -51,4 +56,5 @@ Phantom can conflict with another wallet extension while both inject `window.eth
 
 - Editable icon source: `public/icons/source/icon-studies.svg`;
 - licensing notes: `ICON_LICENSES.md`;
-- the remote Catalina day/night wallpapers are localhost-only references and must be replaced with an owned or licensed pair before publication.
+- the temporary Catalina day/night references are replaced by an owned pair in
+  Phase 5 and must not be published before then.

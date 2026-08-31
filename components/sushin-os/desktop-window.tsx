@@ -7,6 +7,7 @@ import type {
   RefObject,
 } from 'react';
 import { useRef } from 'react';
+import { dictionaries, type Locale } from '@/content/i18n';
 
 export type WindowPosition = { x: number; y: number };
 export type WindowTransitionPhase =
@@ -26,6 +27,7 @@ type DesktopWindowProps = {
   minimized: boolean;
   phase: WindowTransitionPhase;
   mobile: boolean;
+  locale: Locale;
   desktopRef: RefObject<HTMLDivElement | null>;
   children: ReactNode;
   className?: string;
@@ -53,6 +55,7 @@ export function DesktopWindow({
   minimized,
   phase,
   mobile,
+  locale,
   desktopRef,
   children,
   className = '',
@@ -62,6 +65,7 @@ export function DesktopWindow({
   onMove,
   onToggleMaximize,
 }: DesktopWindowProps) {
+  const dictionary = dictionaries[locale];
   const windowRef = useRef<HTMLDialogElement | null>(null);
   const dragOrigin = useRef<DragOrigin | null>(null);
 
@@ -136,22 +140,24 @@ export function DesktopWindow({
         onPointerMove={handlePointerMove}
         onPointerUp={releasePointer}
       >
-        <div className="traffic-lights" aria-label="Управление окном">
+        <div className="traffic-lights" aria-label={dictionary.menus.window}>
           <button
-            aria-label={`Закрыть ${title}`}
+            aria-label={`${dictionary.actions.closeWindow} ${title}`}
             className="traffic-close"
             onClick={onClose}
             type="button"
           />
           <button
-            aria-label={`Свернуть ${title}`}
+            aria-label={`${dictionary.actions.minimizeWindow} ${title}`}
             className="traffic-minimize"
             onClick={onMinimize}
             type="button"
           />
           <button
             aria-label={
-              maximized ? `Восстановить ${title}` : `Развернуть ${title}`
+              maximized
+                ? `${dictionary.actions.restoreWindow} ${title}`
+                : `${dictionary.actions.maximizeWindow} ${title}`
             }
             className="traffic-zoom"
             onClick={onToggleMaximize}

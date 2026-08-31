@@ -85,17 +85,3 @@ export const sushinFacts: SushinFact[] = [
     text: 'Сейчас Sushin OS существует только локально: никакого production или публикации до отдельного решения.',
   },
 ];
-
-export const vladislavProfile = {
-  name: 'Vladislav Sushin',
-  role: 'Project Manager in AI development',
-  birthdayLabel: '31 MAY',
-  ageLabel: 'YEAR TO CONFIRM',
-  intro:
-    'Фотография, биографический текст и год рождения ожидают подтверждения. Роль и структура окна уже зафиксированы.',
-  contentStatus: [
-    { label: 'ROLE', value: 'CONFIRMED' },
-    { label: 'PHOTO', value: 'REQUIRED' },
-    { label: 'BIO', value: 'REQUIRED' },
-  ],
-} as const;
