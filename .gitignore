@@ -46,3 +46,8 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# temporary third-party assets, localhost only (npm run assets:temporary)
+/public/icons/ryos/
+/public/assistant/
+/public/wallpapers/morph/

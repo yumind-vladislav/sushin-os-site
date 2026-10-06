@@ -6,6 +6,7 @@ import { dictionaries, type Locale } from '@/content/i18n';
 import { sushinFacts } from '@/content/sushin-os-content';
 import { nextFactIndex } from '@/lib/random-fact';
 import { trackAnalyticsEvent } from '@/lib/analytics';
+import { useAppCommand } from '@/lib/app-commands';
 
 const rouletteDelays = [45, 95, 155, 225, 305, 395, 495, 610, 740];
 const soundStorageKey = 'sushin-os.random-fact.sound.v1';
@@ -113,6 +114,11 @@ export function RandomFactPanel({ locale }: { locale: Locale }) {
       // Sound still works for the current session when storage is unavailable.
     }
   };
+
+  useAppCommand('fact', (command) => {
+    if (command === 'next') showRandomFact();
+    if (command === 'toggle-sound') toggleSound();
+  });
 
   return (
     <div className="fact-panel">

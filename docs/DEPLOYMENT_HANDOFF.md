@@ -61,6 +61,15 @@ For a later, separately authorized setup:
    the resulting non-production Layero preview without exposing payloads or
    logs.
 
+## Publication blockers added 2026-10-06
+
+- Replace the temporary ryOS icons, Rover sprite, and 21st.dev wallpapers
+  (`ICON_LICENSES.md`, `docs/ASSET_PROVENANCE.md`).
+- Optional Rover proxy: `services/assistant-proxy/README.md`. Without
+  `NEXT_PUBLIC_ASSISTANT_URL` the site ships with offline assistant answers.
+- CSP must allow the YouTube no-cookie frame for Videos and the proxy origin in
+  `connect-src` when it is enabled; demo audio uses `blob:` media URLs.
+
 ## Rollback
 
 The site is a static artifact: select the previously accepted Git commit and

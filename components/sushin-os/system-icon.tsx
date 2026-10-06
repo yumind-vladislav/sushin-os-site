@@ -1,4 +1,5 @@
-import type { IconKind } from '@/content/icon-manifest';
+import Image from 'next/image';
+import { temporaryIconFiles, type IconKind } from '@/content/icon-manifest';
 
 type SystemIconProps = {
   kind: IconKind;
@@ -8,14 +9,15 @@ type SystemIconProps = {
 
 export function SystemIcon({ kind, size = 72, className = '' }: SystemIconProps) {
   return (
-    <svg
+    <Image
+      alt=""
       aria-hidden="true"
       className={`os-system-icon ${className}`}
+      draggable={false}
       height={size}
-      viewBox="0 0 512 512"
+      src={temporaryIconFiles[kind]}
+      unoptimized
       width={size}
-    >
-      <use href={`/icons/source/icon-studies.svg#system-${kind}`} />
-    </svg>
+    />
   );
 }

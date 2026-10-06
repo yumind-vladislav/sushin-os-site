@@ -61,6 +61,7 @@ The approved local implementation may proceed. Public code-repository setup is a
 ## Local commands
 
 ```bash
+npm run assets:temporary # once: localhost-only ryOS icons, Rover, wallpapers
 npm test
 npm run dev
 npm run lint
@@ -91,6 +92,9 @@ Phantom can conflict with another wallet extension while both inject `window.eth
 
 ## Assets
 
+- Temporary localhost-only icons, Rover sprite and wallpapers are gitignored and
+  fetched by `npm run assets:temporary`; they block publication;
+- Rover assistant proxy (OpenRouter): `services/assistant-proxy/README.md`;
 - Editable icon source: `public/icons/source/icon-studies.svg`;
 - licensing notes: `ICON_LICENSES.md`;
 - source and transformation records: `docs/ASSET_PROVENANCE.md`;

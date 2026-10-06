@@ -55,3 +55,27 @@ remain outside the repository and are never modified.
 - Rights: supplied through and approved for the site owner's own Box News
   channel
 - Recorded: 2026-08-31
+
+## Temporary wallpapers — localhost only
+
+- Public files: `public/wallpapers/morph/{forest,night-peak,lake,hills,wildflowers,beach}.jpg`
+  and matching `-thumb.jpg`
+- Source: the 21st.dev Morph Gallery demo by @kedhareswer, mirrored from
+  `cdn.21st.dev/assets/mirror/…`; original photographers and license unknown
+- Output: 1600 × 900 JPEG and 200 × 120 thumbnails, unmodified
+- Status: chosen by Vladislav on 2026-10-06 for local work; gitignored and
+  fetched with `npm run assets:temporary`; **must be replaced before
+  publication**. The original northern-island pair remains in
+  `public/wallpapers/` and can be restored as the published set.
+- Recorded: 2026-10-06
+
+## Temporary icons and Rover sprite — localhost only
+
+See `ICON_LICENSES.md`. Recorded: 2026-10-06.
+
+## Demo music
+
+- iPod and Winamp play three original chiptune placeholders composed in
+  `lib/demo-tracks.ts` and rendered in the browser; no audio file is shipped.
+- Rights: project-owned code.
+- Recorded: 2026-10-06

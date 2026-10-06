@@ -122,11 +122,30 @@ the Telegram blog. Explain expected use briefly.
 Final implementation stage. Accessible Privacy, Terms, analytics/cookie
 information, owner identity, and the iCloud legal email. No contact form.
 
+## ryOS-inspired shell (approved 2026-10-06)
+
+- Menu bar: the app-name slot shows the front window; each app contributes its
+  own menus from `content/apps.ts`. With no window open, the desktop menus
+  (File, View with appearance and wallpapers, Window) are shown.
+- Wallpapers: six photos with a Morph Gallery shader transition; automatic
+  mode picks a day or night photo on the 04:00/17:00 schedule; manual choice is
+  persisted. Reduced motion switches without the dissolve.
+- Spotlight: ⌘K / Ctrl+K or the menu-bar search button. Results: apps, Box
+  News articles, and a final “Ask Rover” row.
+- Rover: bottom-right desktop assistant. Offline answers by default; with
+  `NEXT_PUBLIC_ASSISTANT_URL` it calls the OpenRouter proxy. Allowed actions:
+  open a window, next wallpaper, toggle theme. Can be hidden from the OS menu.
+- Dock utilities: Stickies, Calendar, Calculator, Paint, Synth, Minesweeper,
+  iPod, Winamp, Videos. Personal content stays on the desktop. No Finder.
+- Temporary third-party icons, wallpapers and Rover sprite are localhost-only
+  and block publication.
+
 ## Removed or deferred
 
 - `/icon-studies`: remove from the public build.
 - Alternative Reality: option A, remove for this release.
 - Dashboard, Chats, Finder, Internet Explorer, and Karaoke: out of scope.
+- Video and music libraries: waiting for owner-supplied YouTube ids and audio.
 - Search/filter for Box News: defer.
 - Custom wallpaper upload and intensity controls: defer.
 - Contact form: explicitly excluded.

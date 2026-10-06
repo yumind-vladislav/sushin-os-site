@@ -2,6 +2,34 @@
 
 ## [Unreleased]
 
+### Added — ryOS-inspired shell (2026-10-06)
+
+- Nine working utility apps in the Dock: Stickies, Calendar, Calculator, Paint,
+  Synth, Minesweeper, iPod, Winamp and Videos. Notes and calendar events stay
+  in the visitor's browser; iPod and Winamp play original in-browser demo
+  tracks until owned audio is added; Videos is click-to-load YouTube with an
+  empty playlist until ids are supplied.
+- App registry (`content/apps.ts`) with per-app menus: the menu bar now shows
+  the front window's name and its own menus, and the Window menu lists apps.
+- Spotlight (⌘K / Ctrl+K and the menu-bar search button) over apps and Box News,
+  ending with “Ask Rover”.
+- Rover desktop assistant (Microsoft Agent sprite via ryOS) with offline
+  navigation answers and an optional OpenRouter proxy
+  (`services/assistant-proxy`, DeepSeek by default); actions are limited to
+  opening windows, the next wallpaper and the theme switch.
+- Morph Gallery (21st.dev) shader transitions between six wallpapers, with an
+  automatic day/night choice on the existing 04:00/17:00 schedule.
+
+### Changed — ryOS-inspired shell
+
+- Icons now come from a temporary localhost-only raster set taken from ryOS
+  (Mac OS X–era Apple and third-party icons); the original vector study stays in
+  `public/icons/source/`. Wallpapers and the Rover sprite are also temporary.
+  **All three block publication** until replaced — see `ICON_LICENSES.md` and
+  `docs/ASSET_PROVENANCE.md`.
+- Desktop storage key moved to `sushin-os.desktop.v6`; v1–v5 state, including
+  day/night wallpaper overrides, migrates automatically.
+
 ### Added
 
 - Typed RU/EN dictionaries, locale persistence and browser-locale selection.

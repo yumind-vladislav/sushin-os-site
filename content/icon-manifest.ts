@@ -7,7 +7,44 @@ export type IconKind =
   | 'social'
   | 'about'
   | 'write'
-  | 'skills';
+  | 'skills'
+  | 'stickies'
+  | 'calendar'
+  | 'calculator'
+  | 'minesweeper'
+  | 'synth'
+  | 'paint'
+  | 'ipod'
+  | 'winamp'
+  | 'videos'
+  | 'assistant';
+
+/**
+ * Temporary localhost-only raster set taken from ryOS (Mac OS X–era icons).
+ * These are third-party assets: replace every file before publication. See
+ * ICON_LICENSES.md.
+ */
+export const temporaryIconFiles: Record<IconKind, string> = {
+  vladislav: '/icons/ryos/contacts.png',
+  about: '/icons/ryos/mac.png',
+  cv: '/icons/ryos/file-pdf.png',
+  projects: '/icons/ryos/applications.png',
+  facts: '/icons/ryos/dictionary.png',
+  news: '/icons/ryos/sites.png',
+  social: '/icons/ryos/chats.png',
+  write: '/icons/ryos/mail.png',
+  skills: '/icons/ryos/automator.png',
+  stickies: '/icons/ryos/stickies.png',
+  calendar: '/icons/ryos/calendar.png',
+  calculator: '/icons/ryos/calculator.png',
+  minesweeper: '/icons/ryos/minesweeper-app.png',
+  synth: '/icons/ryos/synth.png',
+  paint: '/icons/ryos/paint.png',
+  ipod: '/icons/ryos/ipod.png',
+  winamp: '/icons/ryos/winamp.png',
+  videos: '/icons/ryos/videos.png',
+  assistant: '/icons/ryos/assistant.png',
+};
 
 export type IconDirectionId = 'system' | 'editorial' | 'instrument';
 

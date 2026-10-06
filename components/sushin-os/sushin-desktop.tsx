@@ -1,18 +1,22 @@
 'use client';
 
-import type { CSSProperties } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { Search } from 'lucide-react';
+import type { CSSProperties, ReactNode } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import MorphGallery from '@/components/ui/morph-gallery';
+import {
+  appDefinitions,
+  appIds,
+  dockApps,
+  type AppId,
+  type MenuAction,
+  type MenuItem,
+} from '@/content/apps';
 import type { IconKind } from '@/content/icon-manifest';
-import {
-  dictionaries,
-  resolveLocale,
-  type Locale,
-} from '@/content/i18n';
-import {
-  wallpaperForLocalHour,
-  type Wallpaper,
-} from '@/lib/appearance';
+import { dictionaries, resolveLocale, type Locale } from '@/content/i18n';
 import { trackAnalyticsEvent } from '@/lib/analytics';
+import { dispatchAppCommand } from '@/lib/app-commands';
+import type { AssistantAction } from '@/lib/assistant';
 import type { BoxNewsSummary } from '@/lib/box-news';
 import {
   createVisitorClockFormatter,
@@ -20,33 +24,42 @@ import {
   fallbackTimeZone,
 } from '@/lib/time-zone';
 import {
-  DesktopWindow,
-  type WindowPosition,
-  type WindowTransitionPhase,
-} from './desktop-window';
+  automaticWallpaperFor,
+  isWallpaperId,
+  wallpaperIndex,
+  wallpapers,
+  type WallpaperId,
+} from '@/lib/wallpapers';
+import { CalculatorApp } from './apps/calculator-app';
+import { CalendarApp } from './apps/calendar-app';
+import { IpodApp } from './apps/ipod-app';
+import { MinesweeperApp } from './apps/minesweeper-app';
+import { PaintApp } from './apps/paint-app';
+import { StickiesApp } from './apps/stickies-app';
+import { SynthApp } from './apps/synth-app';
+import { VideosApp } from './apps/videos-app';
+import { WinampApp } from './apps/winamp-app';
 import { BoxNewsPanel } from './box-news-panel';
 import { CapabilitiesPanel } from './capabilities-panel';
 import { ContactPanel } from './contact-panel';
 import { CvPanel } from './cv-panel';
+import {
+  DesktopWindow,
+  type WindowPosition,
+  type WindowTransitionPhase,
+} from './desktop-window';
 import { LegalFold } from './legal-fold';
 import { MusicUtility } from './music-utility';
 import { ProjectsPanel } from './projects-panel';
 import { RandomFactPanel } from './random-fact-panel';
+import { RoverAssistant, type AssistantRequest } from './rover-assistant';
 import { SocialPanel } from './social-panel';
+import { Spotlight } from './spotlight';
 import { SystemIcon } from './system-icon';
 import { VladislavPanel } from './vladislav-panel';
 
-type WindowId =
-  | 'fact'
-  | 'vladislav'
-  | 'cv'
-  | 'projects'
-  | 'social'
-  | 'contact'
-  | 'skills'
-  | 'news';
 type Theme = 'aqua' | 'dark-aqua';
-type MenuId = 'system' | 'file' | 'view' | 'window';
+type MenuId = 'system' | 'app' | 'file' | 'view' | 'window' | `app:${string}`;
 
 type ManagedWindow = {
   open: boolean;
@@ -56,11 +69,20 @@ type ManagedWindow = {
   position: WindowPosition;
 };
 
-type WindowMap = Record<WindowId, ManagedWindow>;
-type WindowPhaseMap = Record<WindowId, WindowTransitionPhase>;
+type WindowMap = Record<AppId, ManagedWindow>;
+type WindowPhaseMap = Record<AppId, WindowTransitionPhase>;
 
-const STORAGE_KEY = 'sushin-os.desktop.v5';
+type StoredDesktop = {
+  windows?: Partial<WindowMap>;
+  theme?: Theme;
+  wallpaperOverride?: WallpaperId | null;
+  locale?: Locale;
+  assistantVisible?: boolean;
+};
+
+const STORAGE_KEY = 'sushin-os.desktop.v6';
 const LEGACY_STORAGE_KEYS = [
+  'sushin-os.desktop.v5',
   'sushin-os.desktop.v4',
   'sushin-os.desktop.v3',
   'sushin-os.desktop.v2',
@@ -69,130 +91,65 @@ const LEGACY_STORAGE_KEYS = [
 const WINDOW_MOTION_MS = 420;
 const WINDOW_CLOSE_MS = 240;
 
-const initialWindows: WindowMap = {
-  fact: {
-    open: true,
+const initialWindows = appIds.reduce<WindowMap>((next, id) => {
+  next[id] = {
+    open: id === 'fact',
     minimized: false,
     maximized: false,
-    zIndex: 4,
-    position: { x: 356, y: 96 },
-  },
-  vladislav: {
-    open: false,
-    minimized: false,
-    maximized: false,
-    zIndex: 3,
-    position: { x: 126, y: 138 },
-  },
-  cv: {
-    open: false,
-    minimized: false,
-    maximized: false,
-    zIndex: 3,
-    position: { x: 178, y: 70 },
-  },
-  projects: {
-    open: false,
-    minimized: false,
-    maximized: false,
-    zIndex: 3,
-    position: { x: 220, y: 110 },
-  },
-  social: {
-    open: false,
-    minimized: false,
-    maximized: false,
-    zIndex: 3,
-    position: { x: 270, y: 84 },
-  },
-  contact: {
-    open: false,
-    minimized: false,
-    maximized: false,
-    zIndex: 3,
-    position: { x: 318, y: 150 },
-  },
-  skills: {
-    open: false,
-    minimized: false,
-    maximized: false,
-    zIndex: 3,
-    position: { x: 240, y: 92 },
-  },
-  news: {
-    open: false,
-    minimized: false,
-    maximized: false,
-    zIndex: 3,
-    position: { x: 194, y: 72 },
-  },
-};
+    zIndex: id === 'fact' ? 4 : 3,
+    position: appDefinitions[id].position,
+  };
+  return next;
+}, {} as WindowMap);
 
-const initialWindowPhases: WindowPhaseMap = {
-  fact: 'idle',
-  vladislav: 'idle',
-  cv: 'idle',
-  projects: 'idle',
-  social: 'idle',
-  contact: 'idle',
-  skills: 'idle',
-  news: 'idle',
+const initialWindowPhases = appIds.reduce<WindowPhaseMap>((next, id) => {
+  next[id] = 'idle';
+  return next;
+}, {} as WindowPhaseMap);
+
+const windowClassNames: Partial<Record<AppId, string>> = {
+  fact: 'fact-window',
+  vladislav: 'profile-window',
+  cv: 'cv-window',
+  projects: 'projects-window',
+  skills: 'skills-window',
+  social: 'social-window',
+  contact: 'contact-window',
+  news: 'news-window',
 };
 
 const desktopIcons: Array<{
-  id: string;
-  label: string;
+  id: 'cv' | 'projects' | 'social' | 'profile' | 'news';
   kind: IconKind;
-  window?: WindowId;
+  window: AppId;
   align: 'left' | 'right';
 }> = [
-  { id: 'cv', label: 'CV', kind: 'cv', window: 'cv', align: 'left' },
-  {
-    id: 'projects',
-    label: 'Projects',
-    kind: 'projects',
-    window: 'projects',
-    align: 'left',
-  },
-  {
-    id: 'social',
-    label: 'Social Media',
-    kind: 'social',
-    window: 'social',
-    align: 'left',
-  },
-  {
-    id: 'profile',
-    label: 'Vladislav',
-    kind: 'vladislav',
-    window: 'vladislav',
-    align: 'right',
-  },
-  {
-    id: 'news',
-    label: 'Box News',
-    kind: 'news',
-    window: 'news',
-    align: 'right',
-  },
+  { id: 'cv', kind: 'cv', window: 'cv', align: 'left' },
+  { id: 'projects', kind: 'projects', window: 'projects', align: 'left' },
+  { id: 'social', kind: 'social', window: 'social', align: 'left' },
+  { id: 'profile', kind: 'vladislav', window: 'vladislav', align: 'right' },
+  { id: 'news', kind: 'news', window: 'news', align: 'right' },
 ];
 
-function readStoredDesktop(): {
-  windows?: Partial<WindowMap>;
-  theme?: Theme;
-  wallpaperOverride?: Wallpaper | null;
-  locale?: Locale;
-} | null {
+/** Dock order: profile shortcuts, utilities, then Box News. */
+const pinnedDock: Array<{ id: AppId; kind: IconKind }> = [
+  { id: 'vladislav', kind: 'about' },
+  { id: 'contact', kind: 'write' },
+  { id: 'skills', kind: 'skills' },
+];
+
+// Stable reference: the gallery rebuilds its textures when the list changes.
+const wallpaperItems = wallpapers.map(({ src, thumb, alt }) => ({ src, thumb, alt }));
+
+const desktopMenus = {
+  ru: { app: 'Sushin OS', next: 'Следующие обои', search: 'Поиск…', assistantShow: 'Показать ассистента', assistantHide: 'Спрятать ассистента', minimize: 'Свернуть', close: 'Закрыть', ask: (title: string) => `Спросить Ровера про «${title}»`, askQuestion: (title: string) => `Что умеет приложение «${title}»?`, credit: 'ВРЕМЕННЫЕ ОБОИ · ТОЛЬКО LOCALHOST' },
+  en: { app: 'Sushin OS', next: 'Next wallpaper', search: 'Search…', assistantShow: 'Show assistant', assistantHide: 'Hide assistant', minimize: 'Minimize', close: 'Close', ask: (title: string) => `Ask Rover about “${title}”`, askQuestion: (title: string) => `What can the “${title}” app do?`, credit: 'TEMPORARY WALLPAPERS · LOCALHOST ONLY' },
+} as const;
+
+function readStoredDesktop(): StoredDesktop | null {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored) as {
-        windows?: Partial<WindowMap>;
-        theme?: Theme;
-        wallpaperOverride?: Wallpaper | null;
-        locale?: Locale;
-      };
-    }
+    if (stored) return JSON.parse(stored) as StoredDesktop;
 
     const legacy = LEGACY_STORAGE_KEYS.map((key) =>
       window.localStorage.getItem(key),
@@ -200,13 +157,15 @@ function readStoredDesktop(): {
     if (!legacy) return null;
     const parsed = JSON.parse(legacy) as {
       theme?: Theme;
-      wallpaper?: Wallpaper;
+      wallpaper?: string;
+      wallpaperOverride?: string | null;
       locale?: Locale;
       windows?: Partial<WindowMap>;
     };
+    const old = parsed.wallpaperOverride ?? parsed.wallpaper ?? null;
     return {
       theme: parsed.theme,
-      wallpaperOverride: parsed.wallpaper ?? null,
+      wallpaperOverride: old === 'day' ? 'forest' : old === 'night' ? 'night-peak' : null,
       locale: parsed.locale,
       windows: parsed.windows,
     };
@@ -219,6 +178,17 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+function runHref(action: Extract<MenuAction, { type: 'href' }>) {
+  const link = document.createElement('a');
+  link.href = action.href;
+  if (action.download) link.download = '';
+  if (action.external) {
+    link.target = '_blank';
+    link.rel = 'noreferrer';
+  }
+  link.click();
+}
+
 export function SushinDesktop({
   boxNewsPosts,
 }: {
@@ -228,15 +198,16 @@ export function SushinDesktop({
   const menuBarRef = useRef<HTMLElement | null>(null);
   const zCounter = useRef(5);
   const hasHydrated = useRef(false);
-  const transitionTimers = useRef<Partial<Record<WindowId, number>>>({});
+  const transitionTimers = useRef<Partial<Record<AppId, number>>>({});
+  const askCounter = useRef(0);
   const [windows, setWindows] = useState<WindowMap>(initialWindows);
   const [windowPhases, setWindowPhases] =
     useState<WindowPhaseMap>(initialWindowPhases);
   const [theme, setTheme] = useState<Theme>('dark-aqua');
   const [scheduledWallpaper, setScheduledWallpaper] =
-    useState<Wallpaper>('night');
+    useState<WallpaperId>('night-peak');
   const [wallpaperOverride, setWallpaperOverride] =
-    useState<Wallpaper | null>(null);
+    useState<WallpaperId | null>(null);
   const [locale, setLocale] = useState<Locale>('ru');
   const [isMobile, setIsMobile] = useState(false);
   const [clock, setClock] = useState({
@@ -247,30 +218,32 @@ export function SushinDesktop({
   });
   const [activeMenu, setActiveMenu] = useState<MenuId | null>(null);
   const [dockHoverIndex, setDockHoverIndex] = useState<number | null>(null);
+  const [spotlightOpen, setSpotlightOpen] = useState(false);
+  const [assistantVisible, setAssistantVisible] = useState(true);
+  const [assistantRequest, setAssistantRequest] =
+    useState<AssistantRequest | null>(null);
 
   useEffect(() => {
     const hydrationTimer = window.setTimeout(() => {
       const saved = readStoredDesktop();
       if (saved?.windows) {
-        const restoredWindows = (Object.keys(initialWindows) as WindowId[]).reduce<WindowMap>(
-          (next, id) => {
-            next[id] = { ...initialWindows[id], ...saved.windows?.[id] };
-            return next;
-          },
-          {} as WindowMap,
-        );
+        const restoredWindows = appIds.reduce<WindowMap>((next, id) => {
+          next[id] = { ...initialWindows[id], ...saved.windows?.[id] };
+          return next;
+        }, {} as WindowMap);
         zCounter.current = Math.max(
           5,
-          ...Object.values(restoredWindows).map(
-            (managedWindow) => managedWindow.zIndex,
-          ),
+          ...Object.values(restoredWindows).map((item) => item.zIndex),
         );
         setWindows(restoredWindows);
       }
       if (saved?.theme) setTheme(saved.theme);
       if (saved && 'wallpaperOverride' in saved) {
-        setWallpaperOverride(saved.wallpaperOverride ?? null);
+        setWallpaperOverride(
+          isWallpaperId(saved.wallpaperOverride) ? saved.wallpaperOverride : null,
+        );
       }
+      if (saved?.assistantVisible === false) setAssistantVisible(false);
       setLocale(resolveLocale(navigator.languages, saved?.locale));
       hasHydrated.current = true;
     }, 0);
@@ -282,16 +255,16 @@ export function SushinDesktop({
     try {
       window.localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ windows, theme, wallpaperOverride, locale }),
+        JSON.stringify({ windows, theme, wallpaperOverride, locale, assistantVisible }),
       );
     } catch {
       // The desktop remains fully usable when browser storage is unavailable.
     }
-  }, [locale, theme, wallpaperOverride, windows]);
+  }, [assistantVisible, locale, theme, wallpaperOverride, windows]);
 
   useEffect(() => {
     const syncWallpaper = () => {
-      setScheduledWallpaper(wallpaperForLocalHour(new Date().getHours()));
+      setScheduledWallpaper(automaticWallpaperFor(new Date().getHours()));
     };
     syncWallpaper();
     const timer = window.setInterval(syncWallpaper, 60_000);
@@ -311,18 +284,15 @@ export function SushinDesktop({
       if (mobile) {
         setActiveMenu((current) => (current === 'system' ? current : null));
         setWindows((current) => {
-          const visible = (Object.keys(current) as WindowId[])
+          const visible = appIds
             .filter((id) => current[id].open && !current[id].minimized)
             .sort((a, b) => current[b].zIndex - current[a].zIndex);
           if (visible.length < 2) return current;
           const keep = visible[0];
-          return (Object.keys(current) as WindowId[]).reduce<WindowMap>(
-            (next, id) => {
-              next[id] = { ...current[id], open: id === keep };
-              return next;
-            },
-            {} as WindowMap,
-          );
+          return appIds.reduce<WindowMap>((next, id) => {
+            next[id] = { ...current[id], open: id === keep };
+            return next;
+          }, {} as WindowMap);
         });
       }
     };
@@ -352,14 +322,22 @@ export function SushinDesktop({
       if (!menuBarRef.current?.contains(event.target as Node))
         setActiveMenu(null);
     };
-    const closeMenuWithKeyboard = (event: KeyboardEvent) => {
+    const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setActiveMenu(null);
+      const spotlightShortcut =
+        (event.metaKey || event.ctrlKey) &&
+        (event.key.toLowerCase() === 'k' || event.code === 'Space');
+      if (spotlightShortcut) {
+        event.preventDefault();
+        setActiveMenu(null);
+        setSpotlightOpen((current) => !current);
+      }
     };
     document.addEventListener('pointerdown', closeMenu);
-    document.addEventListener('keydown', closeMenuWithKeyboard);
+    document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('pointerdown', closeMenu);
-      document.removeEventListener('keydown', closeMenuWithKeyboard);
+      document.removeEventListener('keydown', onKey);
     };
   }, []);
 
@@ -372,14 +350,14 @@ export function SushinDesktop({
     [],
   );
 
-  const clearWindowTimer = (id: WindowId) => {
+  const clearWindowTimer = (id: AppId) => {
     const timer = transitionTimers.current[id];
     if (timer) window.clearTimeout(timer);
     delete transitionTimers.current[id];
   };
 
   const settleWindowPhase = (
-    id: WindowId,
+    id: AppId,
     duration = WINDOW_MOTION_MS,
     after?: () => void,
   ) => {
@@ -397,7 +375,7 @@ export function SushinDesktop({
     }, duration);
   };
 
-  const focusWindow = (id: WindowId) => {
+  const focusWindow = (id: AppId) => {
     const nextZ = ++zCounter.current;
     setWindows((current) => ({
       ...current,
@@ -405,7 +383,7 @@ export function SushinDesktop({
     }));
   };
 
-  const openWindow = (id: WindowId) => {
+  const openWindow = (id: AppId) => {
     if (id === 'vladislav') trackAnalyticsEvent('profile_open', {});
     if (id === 'cv') trackAnalyticsEvent('cv_view', { format: 'html' });
     const nextZ = ++zCounter.current;
@@ -419,25 +397,20 @@ export function SushinDesktop({
     setWindows((current) => {
       const next = { ...current };
       if (isMobile) {
-        (Object.keys(next) as WindowId[]).forEach((windowId) => {
-          if (windowId !== id)
-            next[windowId] = { ...next[windowId], open: false };
+        appIds.forEach((windowId) => {
+          if (windowId !== id) next[windowId] = { ...next[windowId], open: false };
         });
       }
-      next[id] = {
-        ...next[id],
-        open: true,
-        minimized: false,
-        zIndex: nextZ,
-      };
+      next[id] = { ...next[id], open: true, minimized: false, zIndex: nextZ };
       return next;
     });
     if (phase !== 'idle') settleWindowPhase(id);
     setActiveMenu(null);
   };
 
-  const closeWindow = (id: WindowId) => {
+  const closeWindow = (id: AppId) => {
     clearWindowTimer(id);
+    setActiveMenu(null);
     if (prefersReducedMotion()) {
       setWindows((current) => ({
         ...current,
@@ -453,10 +426,9 @@ export function SushinDesktop({
         [id]: { ...current[id], open: false, minimized: false },
       }));
     });
-    setActiveMenu(null);
   };
 
-  const minimizeWindow = (id: WindowId) => {
+  const minimizeWindow = (id: AppId) => {
     clearWindowTimer(id);
     setWindowPhases((current) => ({ ...current, [id]: 'minimizing' }));
     setWindows((current) => ({
@@ -467,7 +439,7 @@ export function SushinDesktop({
     setActiveMenu(null);
   };
 
-  const updateWindow = (id: WindowId, patch: Partial<ManagedWindow>) => {
+  const updateWindow = (id: AppId, patch: Partial<ManagedWindow>) => {
     setWindows((current) => ({
       ...current,
       [id]: { ...current[id], ...patch },
@@ -475,15 +447,14 @@ export function SushinDesktop({
   };
 
   const resetDesktop = () => {
-    (Object.keys(transitionTimers.current) as WindowId[]).forEach(
-      clearWindowTimer,
-    );
+    appIds.forEach(clearWindowTimer);
     zCounter.current = 5;
     setWindows(initialWindows);
     setWindowPhases(initialWindowPhases);
     setTheme('dark-aqua');
-    setScheduledWallpaper(wallpaperForLocalHour(new Date().getHours()));
+    setScheduledWallpaper(automaticWallpaperFor(new Date().getHours()));
     setWallpaperOverride(null);
+    setAssistantVisible(true);
     setActiveMenu(null);
   };
 
@@ -491,40 +462,163 @@ export function SushinDesktop({
     setActiveMenu((current) => (current === menu ? null : menu));
   };
 
-  const chooseTheme = (nextTheme: Theme) => {
-    setTheme(nextTheme);
-    setActiveMenu(null);
-  };
-
-  const chooseWallpaper = (nextWallpaper: Wallpaper) => {
-    setWallpaperOverride(nextWallpaper);
-    setActiveMenu(null);
-  };
-
-  const chooseAutomaticWallpaper = () => {
-    setScheduledWallpaper(wallpaperForLocalHour(new Date().getHours()));
-    setWallpaperOverride(null);
-    setActiveMenu(null);
-  };
-
   const wallpaper = wallpaperOverride ?? scheduledWallpaper;
 
-  const visibleWindows = (Object.keys(windows) as WindowId[])
+  const nextWallpaper = useCallback(() => {
+    setWallpaperOverride((current) => {
+      const index = wallpaperIndex(current ?? scheduledWallpaper);
+      return wallpapers[(index + 1) % wallpapers.length].id;
+    });
+    setActiveMenu(null);
+  }, [scheduledWallpaper]);
+
+  const visibleWindows = appIds
     .filter((id) => windows[id].open && !windows[id].minimized)
     .sort((a, b) => windows[b].zIndex - windows[a].zIndex);
   const frontWindowId = visibleWindows[0] ?? null;
-  const factDockVisible = windows.fact.open && windows.fact.minimized;
-  const newsDockIndex = factDockVisible ? 4 : 3;
   const dictionary = dictionaries[locale];
-  const windowMenuItems: readonly { id: WindowId; label: string }[] = [
-    { id: 'fact', label: dictionary.actions.randomFact },
-    { id: 'vladislav', label: dictionary.desktop.profile },
-    { id: 'cv', label: dictionary.desktop.cv },
-    { id: 'projects', label: dictionary.desktop.projects },
-    { id: 'skills', label: dictionary.desktop.skills },
-    { id: 'social', label: dictionary.desktop.social },
-    { id: 'contact', label: dictionary.desktop.write },
-    { id: 'news', label: dictionary.desktop.news },
+  const shell = desktopMenus[locale];
+
+  const runAction = (action: MenuAction) => {
+    setActiveMenu(null);
+    if (action.type === 'open') openWindow(action.app);
+    else if (action.type === 'href') runHref(action);
+    else if (!frontWindowId) return;
+    else if (action.type === 'command') dispatchAppCommand(frontWindowId, action.command);
+    else if (action.type === 'minimize') minimizeWindow(frontWindowId);
+    else if (action.type === 'close') closeWindow(frontWindowId);
+  };
+
+  const askAssistant = (question: string) => {
+    setAssistantVisible(true);
+    askCounter.current += 1;
+    setAssistantRequest({ id: askCounter.current, question });
+    setActiveMenu(null);
+  };
+
+  const handleAssistantAction = (action: AssistantAction) => {
+    if (action.type === 'open') openWindow(action.app);
+    if (action.type === 'wallpaper-next') nextWallpaper();
+    if (action.type === 'theme-toggle')
+      setTheme((current) => (current === 'dark-aqua' ? 'aqua' : 'dark-aqua'));
+  };
+
+  const appContent = (id: AppId): ReactNode => {
+    switch (id) {
+      case 'fact':
+        return <RandomFactPanel locale={locale} />;
+      case 'vladislav':
+        return (
+          <VladislavPanel
+            locale={locale}
+            onOpenCv={() => openWindow('cv')}
+            onOpenProjects={() => openWindow('projects')}
+          />
+        );
+      case 'cv':
+        return <CvPanel locale={locale} />;
+      case 'projects':
+        return <ProjectsPanel locale={locale} />;
+      case 'skills':
+        return <CapabilitiesPanel locale={locale} />;
+      case 'social':
+        return <SocialPanel locale={locale} />;
+      case 'contact':
+        return <ContactPanel locale={locale} />;
+      case 'news':
+        return <BoxNewsPanel locale={locale} posts={boxNewsPosts} />;
+      case 'stickies':
+        return <StickiesApp locale={locale} />;
+      case 'calendar':
+        return <CalendarApp locale={locale} />;
+      case 'calculator':
+        return <CalculatorApp locale={locale} />;
+      case 'minesweeper':
+        return <MinesweeperApp locale={locale} />;
+      case 'synth':
+        return <SynthApp locale={locale} />;
+      case 'paint':
+        return <PaintApp locale={locale} />;
+      case 'ipod':
+        return <IpodApp locale={locale} />;
+      case 'winamp':
+        return <WinampApp locale={locale} />;
+      case 'videos':
+        return <VideosApp locale={locale} />;
+    }
+  };
+
+  const renderMenuItems = (items: readonly MenuItem[]) =>
+    items.map((item, index) =>
+      item === 'separator' ? (
+        <hr key={`separator-${index}`} />
+      ) : (
+        <button
+          disabled={
+            (item.action.type === 'command' ||
+              item.action.type === 'minimize' ||
+              item.action.type === 'close') &&
+            !frontWindowId
+          }
+          key={item.label.en}
+          onClick={() => runAction(item.action)}
+          role="menuitem"
+          type="button"
+        >
+          <span />
+          {item.label[locale]}
+          {item.shortcut && <kbd>{item.shortcut}</kbd>}
+        </button>
+      ),
+    );
+
+  const menuTrigger = (id: MenuId, label: string, className = 'menu-label') => (
+    <button
+      aria-expanded={activeMenu === id}
+      aria-haspopup="menu"
+      className={`menu-trigger ${className}`}
+      onClick={() => toggleMenu(id)}
+      onPointerEnter={() => activeMenu && activeMenu !== id && setActiveMenu(id)}
+      type="button"
+    >
+      {label}
+    </button>
+  );
+
+  const frontApp = frontWindowId ? appDefinitions[frontWindowId] : null;
+
+  const windowMenuItems = appIds
+    .filter((id) => !dockApps.includes(id) || windows[id].open)
+    .map((id) => ({ id, label: appDefinitions[id].title[locale] }));
+
+  const dockItems: Array<{ id: AppId; kind: IconKind; label: string; group: number }> = [
+    ...pinnedDock.map((item) => ({
+      ...item,
+      label: appDefinitions[item.id].title[locale],
+      group: 0,
+    })),
+    ...dockApps.map((id) => ({
+      id,
+      kind: appDefinitions[id].icon,
+      label: appDefinitions[id].title[locale],
+      group: 1,
+    })),
+    ...appIds
+      .filter(
+        (id) =>
+          windows[id].open &&
+          windows[id].minimized &&
+          id !== 'news' &&
+          !dockApps.includes(id) &&
+          !pinnedDock.some((item) => item.id === id),
+      )
+      .map((id) => ({
+        id,
+        kind: appDefinitions[id].icon,
+        label: appDefinitions[id].title[locale],
+        group: 2,
+      })),
+    { id: 'news', kind: 'news', label: appDefinitions.news.title[locale], group: 2 },
   ];
 
   const dockMotionStyle = (index: number) => {
@@ -536,28 +630,18 @@ export function SushinDesktop({
   };
 
   const renderDesktopIcon = (item: (typeof desktopIcons)[number]) => {
-    const active = item.window
-      ? windows[item.window].open && !windows[item.window].minimized
-      : false;
-    const label = dictionary.desktop[
-      item.id as 'cv' | 'projects' | 'social' | 'profile' | 'news'
-    ];
+    const active = windows[item.window].open && !windows[item.window].minimized;
+    const label = dictionary.desktop[item.id];
     return (
       <button
-        aria-label={
-          item.window
-            ? `${dictionary.desktop.open} ${label}`
-            : `${label} — ${dictionary.desktop.next}`
-        }
+        aria-label={`${dictionary.desktop.open} ${label}`}
         className={`desktop-icon ${active ? 'is-open' : ''}`}
-        disabled={!item.window}
         key={item.id}
-        onClick={() => item.window && openWindow(item.window)}
+        onClick={() => openWindow(item.window)}
         type="button"
       >
-        <SystemIcon kind={item.kind} size={72} />
+        <SystemIcon kind={item.kind} size={64} />
         <span>{label}</span>
-        {!item.window && <small>{dictionary.desktop.next}</small>}
       </button>
     );
   };
@@ -567,49 +651,229 @@ export function SushinDesktop({
       className={`sushin-desktop theme-${theme} wallpaper-${wallpaper}`}
       data-locale={locale}
     >
+      <div aria-hidden="true" className="desktop-wallpaper">
+        <MorphGallery
+          arrows={false}
+          duration={1600}
+          height="100%"
+          index={wallpaperIndex(wallpaper)}
+          interactive={false}
+          items={wallpaperItems}
+          overlay={false}
+          thumbnails={false}
+        />
+      </div>
+
       <header className="os-menubar" ref={menuBarRef}>
         <div className="menu-left">
-          <button
-            aria-expanded={activeMenu === 'system'}
-            aria-label={dictionary.controls.osMenu}
-            className="system-menu-trigger"
-            onClick={() => toggleMenu('system')}
-            type="button"
-          >
-            <span aria-hidden="true" className="os-mark" />
-          </button>
-          <button
-            aria-expanded={activeMenu === 'system'}
-            className="menu-trigger menu-app-trigger"
-            onClick={() => toggleMenu('system')}
-            type="button"
-          >
-            {dictionary.menus.app}
-          </button>
-          <button
-            aria-expanded={activeMenu === 'file'}
-            className="menu-trigger menu-label"
-            onClick={() => toggleMenu('file')}
-            type="button"
-          >
-            {dictionary.menus.file}
-          </button>
-          <button
-            aria-expanded={activeMenu === 'view'}
-            className="menu-trigger menu-label"
-            onClick={() => toggleMenu('view')}
-            type="button"
-          >
-            {dictionary.menus.view}
-          </button>
-          <button
-            aria-expanded={activeMenu === 'window'}
-            className="menu-trigger menu-label"
-            onClick={() => toggleMenu('window')}
-            type="button"
-          >
-            {dictionary.menus.window}
-          </button>
+          <div className="menu-slot">
+            <button
+              aria-expanded={activeMenu === 'system'}
+              aria-haspopup="menu"
+              aria-label={dictionary.controls.osMenu}
+              className="system-menu-trigger"
+              onClick={() => toggleMenu('system')}
+              type="button"
+            >
+              <span aria-hidden="true" className="os-mark" />
+            </button>
+            {activeMenu === 'system' && (
+              <div className="os-menu is-system" role="menu">
+                <button onClick={() => openWindow('vladislav')} role="menuitem" type="button">
+                  <span />
+                  {dictionary.actions.about}
+                </button>
+                <button onClick={() => openWindow('fact')} role="menuitem" type="button">
+                  <span />
+                  {dictionary.actions.randomFact}
+                </button>
+                <hr />
+                <button
+                  onClick={() => {
+                    setActiveMenu(null);
+                    setSpotlightOpen(true);
+                  }}
+                  role="menuitem"
+                  type="button"
+                >
+                  <span />
+                  {shell.search}
+                  <kbd>⌘K</kbd>
+                </button>
+                <button
+                  onClick={() => {
+                    setAssistantVisible((current) => !current);
+                    setActiveMenu(null);
+                  }}
+                  role="menuitem"
+                  type="button"
+                >
+                  <span />
+                  {assistantVisible ? shell.assistantHide : shell.assistantShow}
+                </button>
+                <button onClick={nextWallpaper} role="menuitem" type="button">
+                  <span />
+                  {shell.next}
+                </button>
+                <hr />
+                <button onClick={resetDesktop} role="menuitem" type="button">
+                  <span />
+                  {dictionary.actions.resetOs}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="menu-slot">
+            {menuTrigger('app', frontApp ? frontApp.title[locale] : shell.app, 'menu-app-trigger')}
+            {activeMenu === 'app' && (
+              <div className="os-menu" role="menu">
+                {frontApp ? (
+                  <>
+                    <button
+                      onClick={() => askAssistant(shell.askQuestion(frontApp.title[locale]))}
+                      role="menuitem"
+                      type="button"
+                    >
+                      <span />
+                      {shell.ask(frontApp.title[locale])}
+                    </button>
+                    <hr />
+                    <button onClick={() => minimizeWindow(frontApp.id)} role="menuitem" type="button">
+                      <span />
+                      {shell.minimize}
+                    </button>
+                    <button onClick={() => closeWindow(frontApp.id)} role="menuitem" type="button">
+                      <span />
+                      {shell.close}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => openWindow('vladislav')} role="menuitem" type="button">
+                      <span />
+                      {dictionary.actions.about}
+                    </button>
+                    <hr />
+                    <button onClick={resetDesktop} role="menuitem" type="button">
+                      <span />
+                      {dictionary.actions.resetOs}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
+          {frontApp ? (
+            frontApp.menus.map((menu) => (
+              <div className="menu-slot" key={menu.id}>
+                {menuTrigger(`app:${menu.id}`, menu.label[locale])}
+                {activeMenu === `app:${menu.id}` && (
+                  <div className="os-menu" role="menu">
+                    {renderMenuItems(menu.items)}
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="menu-slot">
+                {menuTrigger('file', dictionary.menus.file)}
+                {activeMenu === 'file' && (
+                  <div className="os-menu" role="menu">
+                    <button onClick={() => openWindow('fact')} role="menuitem" type="button">
+                      <span />
+                      {dictionary.actions.openFact}
+                    </button>
+                    <button onClick={() => openWindow('vladislav')} role="menuitem" type="button">
+                      <span />
+                      {dictionary.actions.openProfile}
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="menu-slot">
+                {menuTrigger('view', dictionary.menus.view)}
+                {activeMenu === 'view' && (
+                  <div className="os-menu is-view" role="menu">
+                    <small>{dictionary.controls.appearance.toUpperCase()}</small>
+                    {(['aqua', 'dark-aqua'] as const).map((value) => (
+                      <button
+                        aria-checked={theme === value}
+                        key={value}
+                        onClick={() => {
+                          setTheme(value);
+                          setActiveMenu(null);
+                        }}
+                        role="menuitemradio"
+                        type="button"
+                      >
+                        <span>{theme === value ? '✓' : ''}</span>
+                        {value === 'aqua' ? dictionary.controls.aqua : dictionary.controls.darkAqua}
+                      </button>
+                    ))}
+                    <hr />
+                    <small>{dictionary.controls.wallpaper.toUpperCase()}</small>
+                    <button
+                      aria-checked={wallpaperOverride === null}
+                      onClick={() => {
+                        setScheduledWallpaper(automaticWallpaperFor(new Date().getHours()));
+                        setWallpaperOverride(null);
+                        setActiveMenu(null);
+                      }}
+                      role="menuitemradio"
+                      type="button"
+                    >
+                      <span>{wallpaperOverride === null ? '✓' : ''}</span>
+                      {dictionary.controls.automatic}
+                    </button>
+                    {wallpapers.map((item) => (
+                      <button
+                        aria-checked={wallpaperOverride === item.id}
+                        key={item.id}
+                        onClick={() => {
+                          setWallpaperOverride(item.id);
+                          setActiveMenu(null);
+                        }}
+                        role="menuitemradio"
+                        type="button"
+                      >
+                        <span>{wallpaperOverride === item.id ? '✓' : ''}</span>
+                        {item.label[locale]}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          <div className="menu-slot">
+            {menuTrigger('window', dictionary.menus.window)}
+            {activeMenu === 'window' && (
+              <div className="os-menu is-window" role="menu">
+                {windowMenuItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => openWindow(item.id)}
+                    role="menuitem"
+                    type="button"
+                  >
+                    <span>
+                      {windows[item.id].open && !windows[item.id].minimized ? '✓' : ''}
+                    </span>
+                    {item.label}
+                  </button>
+                ))}
+                <hr />
+                <button onClick={resetDesktop} role="menuitem" type="button">
+                  <span />
+                  {dictionary.actions.resetDesktop}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <MusicUtility locale={locale} />
@@ -631,9 +895,7 @@ export function SushinDesktop({
             }
             className="appearance-toggle"
             onClick={() =>
-              setTheme((current) =>
-                current === 'dark-aqua' ? 'aqua' : 'dark-aqua',
-              )
+              setTheme((current) => (current === 'dark-aqua' ? 'aqua' : 'dark-aqua'))
             }
             type="button"
           >
@@ -644,152 +906,24 @@ export function SushinDesktop({
           </span>
           <span>{clock.date}</span>
           <strong>{clock.time}</strong>
+          <button
+            aria-label={`${shell.search} (⌘K)`}
+            className="spotlight-toggle"
+            onClick={() => setSpotlightOpen((current) => !current)}
+            title="⌘K"
+            type="button"
+          >
+            <Search aria-hidden="true" size={14} />
+          </button>
         </div>
-
-        {activeMenu === 'system' && (
-          <div className="os-menu is-system" role="menu">
-            <button
-              onClick={() => openWindow('vladislav')}
-              role="menuitem"
-              type="button"
-            >
-              <span />
-              {dictionary.actions.about}
-            </button>
-            <button
-              onClick={() => openWindow('fact')}
-              role="menuitem"
-              type="button"
-            >
-              <span />
-              {dictionary.actions.randomFact}
-            </button>
-            <hr />
-            <button onClick={resetDesktop} role="menuitem" type="button">
-              <span />
-              {dictionary.actions.resetOs}
-            </button>
-          </div>
-        )}
-
-        {activeMenu === 'file' && (
-          <div className="os-menu is-file" role="menu">
-            <button
-              onClick={() => openWindow('fact')}
-              role="menuitem"
-              type="button"
-            >
-              <span />
-              {dictionary.actions.openFact}
-            </button>
-            <button
-              onClick={() => openWindow('vladislav')}
-              role="menuitem"
-              type="button"
-            >
-              <span />
-              {dictionary.actions.openProfile}
-            </button>
-            <hr />
-            <button
-              disabled={!frontWindowId}
-              onClick={() => frontWindowId && closeWindow(frontWindowId)}
-              role="menuitem"
-              type="button"
-            >
-              <span />
-              {dictionary.actions.closeFront}
-            </button>
-          </div>
-        )}
-
-        {activeMenu === 'view' && (
-          <div className="os-menu is-view" role="menu">
-            <small>{dictionary.controls.appearance.toUpperCase()}</small>
-            <button
-              aria-checked={theme === 'aqua'}
-              onClick={() => chooseTheme('aqua')}
-              role="menuitemradio"
-              type="button"
-            >
-              <span>{theme === 'aqua' ? '✓' : ''}</span>
-              {dictionary.controls.aqua}
-            </button>
-            <button
-              aria-checked={theme === 'dark-aqua'}
-              onClick={() => chooseTheme('dark-aqua')}
-              role="menuitemradio"
-              type="button"
-            >
-              <span>{theme === 'dark-aqua' ? '✓' : ''}</span>
-              {dictionary.controls.darkAqua}
-            </button>
-            <hr />
-            <small>{dictionary.controls.wallpaper.toUpperCase()}</small>
-            <button
-              aria-checked={wallpaperOverride === null}
-              onClick={chooseAutomaticWallpaper}
-              role="menuitemradio"
-              type="button"
-            >
-              <span>{wallpaperOverride === null ? '✓' : ''}</span>
-              {dictionary.controls.automatic}
-            </button>
-            <button
-              aria-checked={wallpaperOverride === 'day'}
-              onClick={() => chooseWallpaper('day')}
-              role="menuitemradio"
-              type="button"
-            >
-              <span>{wallpaperOverride === 'day' ? '✓' : ''}</span>
-              {dictionary.controls.day}
-            </button>
-            <button
-              aria-checked={wallpaperOverride === 'night'}
-              onClick={() => chooseWallpaper('night')}
-              role="menuitemradio"
-              type="button"
-            >
-              <span>{wallpaperOverride === 'night' ? '✓' : ''}</span>
-              {dictionary.controls.night}
-            </button>
-          </div>
-        )}
-
-        {activeMenu === 'window' && (
-          <div className="os-menu is-window" role="menu">
-            {windowMenuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => openWindow(item.id)}
-                role="menuitem"
-                type="button"
-              >
-                <span>
-                  {windows[item.id].open && !windows[item.id].minimized ? '✓' : ''}
-                </span>
-                {item.label}
-              </button>
-            ))}
-            <hr />
-            <button onClick={resetDesktop} role="menuitem" type="button">
-              <span />
-              {dictionary.actions.resetDesktop}
-            </button>
-          </div>
-        )}
       </header>
 
       <div className="desktop-stage" ref={desktopRef}>
         <div className="desktop-icon-stack is-left">
-          {desktopIcons
-            .filter((item) => item.align === 'left')
-            .map(renderDesktopIcon)}
+          {desktopIcons.filter((item) => item.align === 'left').map(renderDesktopIcon)}
         </div>
         <div className="desktop-icon-stack is-right">
-          {desktopIcons
-            .filter((item) => item.align === 'right')
-            .map(renderDesktopIcon)}
+          {desktopIcons.filter((item) => item.align === 'right').map(renderDesktopIcon)}
         </div>
 
         <button
@@ -799,321 +933,89 @@ export function SushinDesktop({
           type="button"
         >
           <span className="desktop-fact-ring" aria-hidden="true" />
-          <SystemIcon kind="facts" size={106} />
+          <SystemIcon kind="facts" size={96} />
           <strong>Random Fact</strong>
           <small>{dictionary.desktop.open.toUpperCase()}</small>
         </button>
 
-        {windows.fact.open && (
-          <DesktopWindow
-            active={frontWindowId === 'fact'}
-            className="fact-window"
-            desktopRef={desktopRef}
-            id="fact"
-            locale={locale}
-            maximized={windows.fact.maximized}
-            minimized={windows.fact.minimized}
-            mobile={isMobile}
-            onClose={() => closeWindow('fact')}
-            onFocus={() => focusWindow('fact')}
-            onMinimize={() => minimizeWindow('fact')}
-            onMove={(position) => updateWindow('fact', { position })}
-            onToggleMaximize={() =>
-              updateWindow('fact', { maximized: !windows.fact.maximized })
-            }
-            phase={windowPhases.fact}
-            position={windows.fact.position}
-            title="Random Fact"
-            zIndex={windows.fact.zIndex}
-          >
-            <RandomFactPanel locale={locale} />
-          </DesktopWindow>
-        )}
-
-        {windows.vladislav.open && (
-          <DesktopWindow
-            active={frontWindowId === 'vladislav'}
-            className="profile-window"
-            desktopRef={desktopRef}
-            id="vladislav"
-            locale={locale}
-            maximized={windows.vladislav.maximized}
-            minimized={windows.vladislav.minimized}
-            mobile={isMobile}
-            onClose={() => closeWindow('vladislav')}
-            onFocus={() => focusWindow('vladislav')}
-            onMinimize={() => minimizeWindow('vladislav')}
-            onMove={(position) => updateWindow('vladislav', { position })}
-            onToggleMaximize={() =>
-              updateWindow('vladislav', {
-                maximized: !windows.vladislav.maximized,
-              })
-            }
-            phase={windowPhases.vladislav}
-            position={windows.vladislav.position}
-            title={dictionary.desktop.profile}
-            zIndex={windows.vladislav.zIndex}
-          >
-            <VladislavPanel
+        {appIds.map((id) =>
+          windows[id].open ? (
+            <DesktopWindow
+              active={frontWindowId === id}
+              className={windowClassNames[id] ?? `app-window app-${id}-window`}
+              desktopRef={desktopRef}
+              id={id}
+              key={id}
               locale={locale}
-              onOpenCv={() => openWindow('cv')}
-              onOpenProjects={() => openWindow('projects')}
-            />
-          </DesktopWindow>
-        )}
-
-        {windows.cv.open && (
-          <DesktopWindow
-            active={frontWindowId === 'cv'}
-            className="cv-window"
-            desktopRef={desktopRef}
-            id="cv"
-            locale={locale}
-            maximized={windows.cv.maximized}
-            minimized={windows.cv.minimized}
-            mobile={isMobile}
-            onClose={() => closeWindow('cv')}
-            onFocus={() => focusWindow('cv')}
-            onMinimize={() => minimizeWindow('cv')}
-            onMove={(position) => updateWindow('cv', { position })}
-            onToggleMaximize={() =>
-              updateWindow('cv', { maximized: !windows.cv.maximized })
-            }
-            phase={windowPhases.cv}
-            position={windows.cv.position}
-            title={dictionary.career.cvTitle}
-            zIndex={windows.cv.zIndex}
-          >
-            <CvPanel locale={locale} />
-          </DesktopWindow>
-        )}
-
-        {windows.projects.open && (
-          <DesktopWindow
-            active={frontWindowId === 'projects'}
-            className="projects-window"
-            desktopRef={desktopRef}
-            id="projects"
-            locale={locale}
-            maximized={windows.projects.maximized}
-            minimized={windows.projects.minimized}
-            mobile={isMobile}
-            onClose={() => closeWindow('projects')}
-            onFocus={() => focusWindow('projects')}
-            onMinimize={() => minimizeWindow('projects')}
-            onMove={(position) => updateWindow('projects', { position })}
-            onToggleMaximize={() =>
-              updateWindow('projects', {
-                maximized: !windows.projects.maximized,
-              })
-            }
-            phase={windowPhases.projects}
-            position={windows.projects.position}
-            title={dictionary.career.projectsTitle}
-            zIndex={windows.projects.zIndex}
-          >
-            <ProjectsPanel locale={locale} />
-          </DesktopWindow>
-        )}
-
-        {windows.skills.open && (
-          <DesktopWindow
-            active={frontWindowId === 'skills'}
-            className="skills-window"
-            desktopRef={desktopRef}
-            id="skills"
-            locale={locale}
-            maximized={windows.skills.maximized}
-            minimized={windows.skills.minimized}
-            mobile={isMobile}
-            onClose={() => closeWindow('skills')}
-            onFocus={() => focusWindow('skills')}
-            onMinimize={() => minimizeWindow('skills')}
-            onMove={(position) => updateWindow('skills', { position })}
-            onToggleMaximize={() =>
-              updateWindow('skills', { maximized: !windows.skills.maximized })
-            }
-            phase={windowPhases.skills}
-            position={windows.skills.position}
-            title={dictionary.desktop.skills}
-            zIndex={windows.skills.zIndex}
-          >
-            <CapabilitiesPanel locale={locale} />
-          </DesktopWindow>
-        )}
-
-        {windows.social.open && (
-          <DesktopWindow
-            active={frontWindowId === 'social'}
-            className="social-window"
-            desktopRef={desktopRef}
-            id="social"
-            locale={locale}
-            maximized={windows.social.maximized}
-            minimized={windows.social.minimized}
-            mobile={isMobile}
-            onClose={() => closeWindow('social')}
-            onFocus={() => focusWindow('social')}
-            onMinimize={() => minimizeWindow('social')}
-            onMove={(position) => updateWindow('social', { position })}
-            onToggleMaximize={() =>
-              updateWindow('social', { maximized: !windows.social.maximized })
-            }
-            phase={windowPhases.social}
-            position={windows.social.position}
-            title={dictionary.career.socialTitle}
-            zIndex={windows.social.zIndex}
-          >
-            <SocialPanel locale={locale} />
-          </DesktopWindow>
-        )}
-
-        {windows.contact.open && (
-          <DesktopWindow
-            active={frontWindowId === 'contact'}
-            className="contact-window"
-            desktopRef={desktopRef}
-            id="contact"
-            locale={locale}
-            maximized={windows.contact.maximized}
-            minimized={windows.contact.minimized}
-            mobile={isMobile}
-            onClose={() => closeWindow('contact')}
-            onFocus={() => focusWindow('contact')}
-            onMinimize={() => minimizeWindow('contact')}
-            onMove={(position) => updateWindow('contact', { position })}
-            onToggleMaximize={() =>
-              updateWindow('contact', { maximized: !windows.contact.maximized })
-            }
-            phase={windowPhases.contact}
-            position={windows.contact.position}
-            title={dictionary.career.contactTitle}
-            zIndex={windows.contact.zIndex}
-          >
-            <ContactPanel locale={locale} />
-          </DesktopWindow>
-        )}
-
-        {windows.news.open && (
-          <DesktopWindow
-            active={frontWindowId === 'news'}
-            className="news-window"
-            desktopRef={desktopRef}
-            id="news"
-            locale={locale}
-            maximized={windows.news.maximized}
-            minimized={windows.news.minimized}
-            mobile={isMobile}
-            onClose={() => closeWindow('news')}
-            onFocus={() => focusWindow('news')}
-            onMinimize={() => minimizeWindow('news')}
-            onMove={(position) => updateWindow('news', { position })}
-            onToggleMaximize={() =>
-              updateWindow('news', { maximized: !windows.news.maximized })
-            }
-            phase={windowPhases.news}
-            position={windows.news.position}
-            title={dictionary.desktop.news}
-            zIndex={windows.news.zIndex}
-          >
-            <BoxNewsPanel locale={locale} posts={boxNewsPosts} />
-          </DesktopWindow>
+              maximized={windows[id].maximized}
+              minimized={windows[id].minimized}
+              mobile={isMobile}
+              onClose={() => closeWindow(id)}
+              onFocus={() => focusWindow(id)}
+              onMinimize={() => minimizeWindow(id)}
+              onMove={(position) => updateWindow(id, { position })}
+              onToggleMaximize={() =>
+                updateWindow(id, { maximized: !windows[id].maximized })
+              }
+              phase={windowPhases[id]}
+              position={windows[id].position}
+              title={appDefinitions[id].title[locale]}
+              zIndex={windows[id].zIndex}
+            >
+              {appContent(id)}
+            </DesktopWindow>
+          ) : null,
         )}
 
         <nav aria-label="Sushin OS Dock" className="os-dock">
-          <button
-            aria-label={
-              windows.vladislav.minimized
-                ? dictionary.actions.restoreAbout
-                : dictionary.actions.about
-            }
-            className={`${windows.vladislav.open ? 'is-running' : ''} ${windows.vladislav.minimized ? 'is-minimized-app' : ''}`}
-            data-dock-index="0"
-            onBlur={() => setDockHoverIndex(null)}
-            onClick={() => openWindow('vladislav')}
-            onFocus={() => setDockHoverIndex(0)}
-            onPointerEnter={() => setDockHoverIndex(0)}
-            onPointerLeave={() => setDockHoverIndex(null)}
-            style={dockMotionStyle(0)}
-            type="button"
-          >
-            <span className="dock-tooltip">
-              {windows.vladislav.minimized
-                ? dictionary.actions.restoreAbout
-                : dictionary.actions.about}
-            </span>
-            <SystemIcon kind="about" size={58} />
-          </button>
-          <button
-            aria-label={dictionary.desktop.write}
-            className={`${windows.contact.open ? 'is-running' : ''} ${windows.contact.minimized ? 'is-minimized-app' : ''}`}
-            data-dock-index="1"
-            onBlur={() => setDockHoverIndex(null)}
-            onClick={() => openWindow('contact')}
-            onFocus={() => setDockHoverIndex(1)}
-            onPointerEnter={() => setDockHoverIndex(1)}
-            onPointerLeave={() => setDockHoverIndex(null)}
-            style={dockMotionStyle(1)}
-            type="button"
-          >
-            <span className="dock-tooltip">{dictionary.desktop.write}</span>
-            <SystemIcon kind="write" size={58} />
-          </button>
-          <button
-            aria-label={dictionary.desktop.skills}
-            className={`${windows.skills.open ? 'is-running' : ''} ${windows.skills.minimized ? 'is-minimized-app' : ''}`}
-            data-dock-index="2"
-            onBlur={() => setDockHoverIndex(null)}
-            onClick={() => openWindow('skills')}
-            onFocus={() => setDockHoverIndex(2)}
-            onPointerEnter={() => setDockHoverIndex(2)}
-            onPointerLeave={() => setDockHoverIndex(null)}
-            style={dockMotionStyle(2)}
-            type="button"
-          >
-            <span className="dock-tooltip">{dictionary.desktop.skills}</span>
-            <SystemIcon kind="skills" size={58} />
-          </button>
-          <span className="dock-separator" aria-hidden="true" />
-          {factDockVisible && (
-            <button
-              aria-label={dictionary.actions.restoreFact}
-              className="is-running is-minimized-app"
-              data-dock-index="3"
-              onBlur={() => setDockHoverIndex(null)}
-              onClick={() => openWindow('fact')}
-              onFocus={() => setDockHoverIndex(3)}
-              onPointerEnter={() => setDockHoverIndex(3)}
-              onPointerLeave={() => setDockHoverIndex(null)}
-              style={dockMotionStyle(3)}
-              type="button"
-            >
-              <span className="dock-tooltip">{dictionary.actions.restoreFact}</span>
-              <SystemIcon kind="facts" size={54} />
-            </button>
-          )}
-          <button
-            aria-label={dictionary.desktop.news}
-            className={`${windows.news.open ? 'is-running' : ''} ${windows.news.minimized ? 'is-minimized-app' : ''}`}
-            data-dock-index={newsDockIndex}
-            onBlur={() => setDockHoverIndex(null)}
-            onClick={() => openWindow('news')}
-            onFocus={() => setDockHoverIndex(newsDockIndex)}
-            onPointerEnter={() => setDockHoverIndex(newsDockIndex)}
-            onPointerLeave={() => setDockHoverIndex(null)}
-            style={dockMotionStyle(newsDockIndex)}
-            type="button"
-          >
-            <span className="dock-tooltip">{dictionary.desktop.news}</span>
-            <SystemIcon kind="news" size={54} />
-          </button>
+          {dockItems.map((item, index) => {
+            const state = windows[item.id];
+            const separator = index > 0 && dockItems[index - 1].group !== item.group;
+            return (
+              <Fragment key={`${item.group}-${item.id}`}>
+                {separator && <span className="dock-separator" aria-hidden="true" />}
+                <button
+                  aria-label={item.label}
+                  className={`${state.open ? 'is-running' : ''} ${state.minimized ? 'is-minimized-app' : ''}`}
+                  data-dock-index={index}
+                  onBlur={() => setDockHoverIndex(null)}
+                  onClick={() => openWindow(item.id)}
+                  onFocus={() => setDockHoverIndex(index)}
+                  onPointerEnter={() => setDockHoverIndex(index)}
+                  onPointerLeave={() => setDockHoverIndex(null)}
+                  style={dockMotionStyle(index)}
+                  type="button"
+                >
+                  <span className="dock-tooltip">{item.label}</span>
+                  <SystemIcon kind={item.kind} size={52} />
+                </button>
+              </Fragment>
+            );
+          })}
         </nav>
 
+        {assistantVisible && (
+          <RoverAssistant
+            locale={locale}
+            onAction={handleAssistantAction}
+            onHide={() => setAssistantVisible(false)}
+            request={assistantRequest}
+          />
+        )}
+
         <LegalFold locale={locale} />
-        <span className="wallpaper-credit">
-          {dictionary.desktop.wallpaperCredit}
-        </span>
+        <span className="wallpaper-credit">{shell.credit}</span>
       </div>
+
+      {spotlightOpen && (
+        <Spotlight
+          locale={locale}
+          onAsk={askAssistant}
+          onClose={() => setSpotlightOpen(false)}
+          onOpenApp={openWindow}
+          posts={boxNewsPosts}
+        />
+      )}
     </main>
   );
 }
