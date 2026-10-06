@@ -1,13 +1,14 @@
 // Downloads the temporary third-party assets used on localhost only: ryOS icons,
 // the Rover sprite and the 21st.dev Morph Gallery photos. They are gitignored
 // because the repository is public — see ICON_LICENSES.md.
+import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = path.resolve(import.meta.dirname, '..', 'public');
 
 const icons = [
-  'contacts', 'mac', 'file-pdf', 'applications', 'dictionary', 'sites', 'chats', 'mail',
+  'contacts', 'mac', 'file-pdf', 'applications', 'documents', 'dictionary', 'sites', 'chats', 'mail',
   'automator', 'stickies', 'calendar', 'calculator', 'minesweeper-app', 'synth', 'paint',
   'ipod', 'winamp', 'videos', 'assistant', 'trash-empty',
 ];
@@ -33,9 +34,16 @@ const jobs = [
   ]),
 ];
 
+// Runs before every build; already downloaded files are kept unless --force.
+const force = process.argv.includes('--force');
 let failed = 0;
+let skipped = 0;
 for (const [url, target] of jobs) {
   const destination = path.join(root, target);
+  if (!force && existsSync(destination)) {
+    skipped += 1;
+    continue;
+  }
   try {
     const response = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 sushin-os-local-setup' } });
     if (!response.ok) throw new Error(String(response.status));
@@ -47,5 +55,5 @@ for (const [url, target] of jobs) {
   }
 }
 
-console.log(`temporary assets: ${jobs.length - failed}/${jobs.length} downloaded`);
+console.log(`temporary assets: ${jobs.length - failed - skipped} downloaded, ${skipped} present, ${failed} failed`);
 if (failed) process.exitCode = 1;

@@ -20,6 +20,17 @@
 - Morph Gallery (21st.dev) shader transitions between six wallpapers, with an
   automatic day/night choice on the existing 04:00/17:00 schedule.
 
+### Changed — Layero release prep (2026-10-06)
+
+- Dock keeps only essentials (Vladislav, Write to me, What I can do, Box News)
+  plus running apps; every utility moved into an Applications folder window.
+- Automatic wallpaper mode is now a Morph slideshow every 15 s, starting from
+  the day/night photo for the local hour.
+- `prebuild` fetches the temporary third-party assets, so Git-based builds on
+  Layero ship them without committing them to the public repository.
+- Vladislav accepted the legal risk of publishing the ryOS icons, Rover sprite
+  and 21st.dev photos on 2026-10-06; they are no longer a publication blocker.
+
 ### Changed — ryOS-inspired shell
 
 - Icons now come from a temporary localhost-only raster set taken from ryOS

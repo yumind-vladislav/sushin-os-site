@@ -135,10 +135,13 @@ information, owner identity, and the iCloud legal email. No contact form.
 - Rover: bottom-right desktop assistant. Offline answers by default; with
   `NEXT_PUBLIC_ASSISTANT_URL` it calls the OpenRouter proxy. Allowed actions:
   open a window, next wallpaper, toggle theme. Can be hidden from the OS menu.
-- Dock utilities: Stickies, Calendar, Calculator, Paint, Synth, Minesweeper,
-  iPod, Winamp, Videos. Personal content stays on the desktop. No Finder.
-- Temporary third-party icons, wallpapers and Rover sprite are localhost-only
-  and block publication.
+- Dock: only Vladislav, Write to me, What I can do and Box News, then running
+  apps, then the Applications folder. The folder window lists Stickies,
+  Calendar, Calculator, Paint, Synth, Minesweeper, iPod, Winamp and Videos.
+- Wallpapers: automatic mode runs a Morph slideshow every 15 s; a manual choice
+  stops it.
+- Temporary third-party icons, wallpapers and Rover sprite are published with
+  the owner's accepted risk (2026-10-06).
 
 ## Removed or deferred
 

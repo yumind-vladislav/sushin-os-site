@@ -63,8 +63,10 @@ For a later, separately authorized setup:
 
 ## Publication blockers added 2026-10-06
 
-- Replace the temporary ryOS icons, Rover sprite, and 21st.dev wallpapers
-  (`ICON_LICENSES.md`, `docs/ASSET_PROVENANCE.md`).
+- Temporary ryOS icons, Rover sprite, and 21st.dev wallpapers: published with
+  the owner's accepted risk (2026-10-06). The build downloads them from
+  os.ryo.lu and cdn.21st.dev during `prebuild`, so Layero needs outbound
+  network access at build time (`ICON_LICENSES.md`).
 - Optional Rover proxy: `services/assistant-proxy/README.md`. Without
   `NEXT_PUBLIC_ASSISTANT_URL` the site ships with offline assistant answers.
 - CSP must allow the YouTube no-cookie frame for Videos and the proxy origin in

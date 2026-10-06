@@ -17,7 +17,8 @@ export type IconKind =
   | 'ipod'
   | 'winamp'
   | 'videos'
-  | 'assistant';
+  | 'assistant'
+  | 'applications';
 
 /**
  * Temporary localhost-only raster set taken from ryOS (Mac OS X–era icons).
@@ -28,7 +29,8 @@ export const temporaryIconFiles: Record<IconKind, string> = {
   vladislav: '/icons/ryos/contacts.png',
   about: '/icons/ryos/mac.png',
   cv: '/icons/ryos/file-pdf.png',
-  projects: '/icons/ryos/applications.png',
+  projects: '/icons/ryos/documents.png',
+  applications: '/icons/ryos/applications.png',
   facts: '/icons/ryos/dictionary.png',
   news: '/icons/ryos/sites.png',
   social: '/icons/ryos/chats.png',

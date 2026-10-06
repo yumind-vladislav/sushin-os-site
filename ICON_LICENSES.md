@@ -28,3 +28,11 @@ publication.
 - The files are **gitignored** because this repository is public; committing
   them would already be publication. Fetch them locally with
   `npm run assets:temporary` (`scripts/fetch-temporary-assets.mjs`).
+
+### Publication decision (2026-10-06)
+
+Vladislav decided to publish the site on Layero with these temporary assets and
+accepts the risk of a rights-holder claim. They remain out of Git and are
+downloaded by `npm run build` (`prebuild`). Replace them with original assets
+as soon as possible; removal is a code change in `content/icon-manifest.ts`,
+`lib/wallpapers.ts` and `components/sushin-os/rover-assistant.tsx`.

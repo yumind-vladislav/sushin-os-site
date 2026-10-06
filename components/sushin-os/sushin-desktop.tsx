@@ -30,6 +30,7 @@ import {
   wallpapers,
   type WallpaperId,
 } from '@/lib/wallpapers';
+import { ApplicationsApp } from './apps/applications-app';
 import { CalculatorApp } from './apps/calculator-app';
 import { CalendarApp } from './apps/calendar-app';
 import { IpodApp } from './apps/ipod-app';
@@ -90,6 +91,7 @@ const LEGACY_STORAGE_KEYS = [
 ];
 const WINDOW_MOTION_MS = 420;
 const WINDOW_CLOSE_MS = 240;
+const SLIDESHOW_MS = 15_000;
 
 const initialWindows = appIds.reduce<WindowMap>((next, id) => {
   next[id] = {
@@ -131,19 +133,20 @@ const desktopIcons: Array<{
   { id: 'news', kind: 'news', window: 'news', align: 'right' },
 ];
 
-/** Dock order: profile shortcuts, utilities, then Box News. */
+/** Dock keeps only the essentials; utilities live in the Applications folder. */
 const pinnedDock: Array<{ id: AppId; kind: IconKind }> = [
   { id: 'vladislav', kind: 'about' },
   { id: 'contact', kind: 'write' },
   { id: 'skills', kind: 'skills' },
+  { id: 'news', kind: 'news' },
 ];
 
 // Stable reference: the gallery rebuilds its textures when the list changes.
 const wallpaperItems = wallpapers.map(({ src, thumb, alt }) => ({ src, thumb, alt }));
 
 const desktopMenus = {
-  ru: { app: 'Sushin OS', next: 'Следующие обои', search: 'Поиск…', assistantShow: 'Показать ассистента', assistantHide: 'Спрятать ассистента', minimize: 'Свернуть', close: 'Закрыть', ask: (title: string) => `Спросить Ровера про «${title}»`, askQuestion: (title: string) => `Что умеет приложение «${title}»?`, credit: 'ВРЕМЕННЫЕ ОБОИ · ТОЛЬКО LOCALHOST' },
-  en: { app: 'Sushin OS', next: 'Next wallpaper', search: 'Search…', assistantShow: 'Show assistant', assistantHide: 'Hide assistant', minimize: 'Minimize', close: 'Close', ask: (title: string) => `Ask Rover about “${title}”`, askQuestion: (title: string) => `What can the “${title}” app do?`, credit: 'TEMPORARY WALLPAPERS · LOCALHOST ONLY' },
+  ru: { app: 'Sushin OS', slideshow: 'Слайд-шоу (каждые 15 с)', next: 'Следующие обои', search: 'Поиск…', assistantShow: 'Показать ассистента', assistantHide: 'Спрятать ассистента', minimize: 'Свернуть', close: 'Закрыть', ask: (title: string) => `Спросить Ровера про «${title}»`, askQuestion: (title: string) => `Что умеет приложение «${title}»?`, credit: 'ВРЕМЕННЫЕ ОБОИ · ТОЛЬКО LOCALHOST' },
+  en: { app: 'Sushin OS', slideshow: 'Slideshow (every 15 s)', next: 'Next wallpaper', search: 'Search…', assistantShow: 'Show assistant', assistantHide: 'Hide assistant', minimize: 'Minimize', close: 'Close', ask: (title: string) => `Ask Rover about “${title}”`, askQuestion: (title: string) => `What can the “${title}” app do?`, credit: 'TEMPORARY WALLPAPERS · LOCALHOST ONLY' },
 } as const;
 
 function readStoredDesktop(): StoredDesktop | null {
@@ -262,13 +265,22 @@ export function SushinDesktop({
     }
   }, [assistantVisible, locale, theme, wallpaperOverride, windows]);
 
+  // Automatic mode starts on the day or night photo for the local hour, then
+  // runs a Morph slideshow. Reduced motion and hidden tabs hold the frame.
   useEffect(() => {
-    const syncWallpaper = () => {
+    const initial = window.setTimeout(() => {
       setScheduledWallpaper(automaticWallpaperFor(new Date().getHours()));
+    }, 0);
+    const timer = window.setInterval(() => {
+      if (document.hidden || prefersReducedMotion()) return;
+      setScheduledWallpaper(
+        (current) => wallpapers[(wallpaperIndex(current) + 1) % wallpapers.length].id,
+      );
+    }, SLIDESHOW_MS);
+    return () => {
+      window.clearTimeout(initial);
+      window.clearInterval(timer);
     };
-    syncWallpaper();
-    const timer = window.setInterval(syncWallpaper, 60_000);
-    return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -527,6 +539,8 @@ export function SushinDesktop({
         return <ContactPanel locale={locale} />;
       case 'news':
         return <BoxNewsPanel locale={locale} posts={boxNewsPosts} />;
+      case 'applications':
+        return <ApplicationsApp locale={locale} onOpen={openWindow} />;
       case 'stickies':
         return <StickiesApp locale={locale} />;
       case 'calendar':
@@ -597,28 +611,28 @@ export function SushinDesktop({
       label: appDefinitions[item.id].title[locale],
       group: 0,
     })),
-    ...dockApps.map((id) => ({
-      id,
-      kind: appDefinitions[id].icon,
-      label: appDefinitions[id].title[locale],
-      group: 1,
-    })),
+    // Like Mac OS X: running utilities and minimized windows appear after the
+    // separator, then the Applications folder.
     ...appIds
       .filter(
         (id) =>
           windows[id].open &&
-          windows[id].minimized &&
-          id !== 'news' &&
-          !dockApps.includes(id) &&
+          id !== 'applications' &&
+          (dockApps.includes(id) || windows[id].minimized) &&
           !pinnedDock.some((item) => item.id === id),
       )
       .map((id) => ({
         id,
         kind: appDefinitions[id].icon,
         label: appDefinitions[id].title[locale],
-        group: 2,
+        group: 1,
       })),
-    { id: 'news', kind: 'news', label: appDefinitions.news.title[locale], group: 2 },
+    {
+      id: 'applications',
+      kind: 'applications',
+      label: appDefinitions.applications.title[locale],
+      group: 2,
+    },
   ];
 
   const dockMotionStyle = (index: number) => {
@@ -826,7 +840,7 @@ export function SushinDesktop({
                       type="button"
                     >
                       <span>{wallpaperOverride === null ? '✓' : ''}</span>
-                      {dictionary.controls.automatic}
+                      {shell.slideshow}
                     </button>
                     {wallpapers.map((item) => (
                       <button

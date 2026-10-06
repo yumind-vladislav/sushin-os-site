@@ -1495,3 +1495,56 @@
     height: 42px;
   }
 }
+
+/* ---- Applications folder ------------------------------------------------- */
+
+.app-applications-window {
+  width: 470px;
+  height: 380px;
+}
+
+.applications-app {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.applications-grid {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  align-content: start;
+  gap: 6px;
+  margin: 0;
+  overflow-y: auto;
+  padding: 14px;
+  list-style: none;
+}
+
+.applications-item {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  color: var(--os-window-ink);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.applications-item:hover,
+.applications-item:focus-visible {
+  background: var(--os-panel);
+}
+
+.applications-status {
+  margin: 0;
+  padding: 6px;
+  color: var(--os-window-muted);
+  border-top: 1px solid var(--os-window-line);
+  font-size: 11px;
+  text-align: center;
+}

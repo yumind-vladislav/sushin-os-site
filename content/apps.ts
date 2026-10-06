@@ -10,6 +10,7 @@ export const appIds = [
   'contact',
   'skills',
   'news',
+  'applications',
   'stickies',
   'calendar',
   'calculator',
@@ -185,6 +186,18 @@ export const appDefinitions: Record<AppId, AppDefinition> = {
     keywords: ['новости', 'блог', 'news', 'статьи', 'telegram'],
     summary: text('Архив публикаций Box News.', 'The Box News archive.'),
     position: { x: 194, y: 72 },
+    menus: [fileMenu()],
+  },
+  applications: {
+    id: 'applications',
+    icon: 'applications',
+    title: text('Приложения', 'Applications'),
+    keywords: ['приложения', 'программы', 'applications', 'apps', 'finder'],
+    summary: text(
+      'Папка со всеми программами: записки, календарь, калькулятор, игры и плееры.',
+      'The folder with every utility: notes, calendar, calculator, games and players.',
+    ),
+    position: { x: 160, y: 70 },
     menus: [fileMenu()],
   },
   stickies: {
@@ -402,7 +415,7 @@ export const appDefinitions: Record<AppId, AppDefinition> = {
   },
 };
 
-/** Personal content lives on the desktop; small utilities live in the Dock. */
+/** Utilities shown in the Applications folder (and in the Dock while running). */
 export const dockApps: readonly AppId[] = [
   'stickies',
   'calendar',
