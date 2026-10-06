@@ -5,6 +5,19 @@ directory. Production publishing remains a separate, explicitly authorized
 operation. Nothing in this document authorizes a Layero deployment, a Netcup
 change, or a Telegram `setWebhook` call.
 
+## Current production (2026-10-06)
+
+- Layero project `sushin-os-site` in the `sushin-dev` workspace, imported from
+  GitHub `yumind-vladislav/sushin-os-site`, branch `main`, deploy on every push.
+- Address: https://sushin-os.layero.app (custom domain not attached yet).
+- Build `npm run build` (runs `prebuild` asset fetch), output `out`, Node auto.
+- Environment: `NEXT_PUBLIC_SITE_URL=https://sushin-os.layero.app`;
+  Metrica and the assistant proxy URL are unset.
+- Verified after the first deploy: `/`, `/cv/`, `/box-news/719/`, `/privacy/`,
+  `/sitemap.xml`, `/robots.txt`, `/rss.xml` return 200, unknown paths 404,
+  icons/wallpapers/Rover load, canonical points to the Layero origin.
+- Not yet configured: security headers and CSP at the Layero edge.
+
 ## Layero static site
 
 Use Node.js 22.13 or newer and install from the lockfile.
